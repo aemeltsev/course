@@ -24,13 +24,15 @@ std::size_t tree_height(std::vector<int>& parent)
 
 int main()
 {
+    const std::string TXT_OUT = "The height of the binary tree is ";
+
     std::vector<int> parent00{-1, 0, 0, 1, 2, 2, 4, 4};
     std::vector<int> parent01{4, -1, 4, 1, 1};
     std::vector<int> parent02{-1, 0, 4, 0, 3};
 
-    std::cout << "The height of the binary tree is " << tree_height(parent00) << '\n';
-    std::cout << "The height of the binary tree is " << tree_height(parent01) << '\n';
-    std::cout << "The height of the binary tree is " << tree_height(parent02) << '\n';
+    std::cout << TXT_OUT << tree_height(parent00) << '\n';
+    std::cout << TXT_OUT << tree_height(parent01) << '\n';
+    std::cout << TXT_OUT << tree_height(parent02) << '\n';
 
     return 0;
 }
