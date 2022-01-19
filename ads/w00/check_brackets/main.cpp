@@ -46,6 +46,9 @@ std::pair<bool, std::size_t> string_check(const std::string& str)
 
 int main()
 {
+    const std::string OUT_ERR = "Incorrect evaluation";
+    const std::string OUT_SUCC = "Correct evaluation";
+
     std::string str00 = "({})";
     std::string str01 = "({}[()]{}(){)";
     std::string str02 = "({)";
@@ -58,9 +61,9 @@ int main()
     auto two = string_check(str01);
     auto tree = string_check(str02);
 
-    std::string out00 = ((one.first && one.second == 0) ? "Correct evaluation" : "Incorrect evaluation");
-    std::string out01 = ((two.first && two.second == 0) ? "Correct evaluation" : "Incorrect evaluation");
-    std::string out02 = ((tree.first && tree.second == 0) ? "Correct evaluation" : "Incorrect evaluation");
+    std::string out00 = ((one.first && one.second == 0) ? OUT_SUCC : OUT_ERR);
+    std::string out01 = ((two.first && two.second == 0) ? OUT_SUCC : OUT_ERR);
+    std::string out02 = ((tree.first && tree.second == 0) ? OUT_SUCC : OUT_ERR);
 
     std::cout << out00 << '\n';
     std::cout << out01 << " " << two.second << '\n';
