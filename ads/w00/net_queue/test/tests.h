@@ -1,9 +1,9 @@
-#ifndef SPLAYT_H
-#define SPLAYT_H
+#ifndef NQUEUE_H
+#define NQUEUE_H
 
 #include <iostream>
 #include <ctime>
 #include <gtest/gtest.h>
-#include "spltree.h"
+#include "nqueue.h"
 
-#endif //SPLAYT_H
+#endif //NQUEUE_H
