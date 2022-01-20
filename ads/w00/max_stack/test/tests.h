@@ -64,27 +64,74 @@ TEST(MaxStack, FirstStack)
     ASSERT_EQ(emmit.first.size(), stack.cs_size());
 }
 
-TEST(MaxStack, SecStack)
-{
-    //Arrange
-    auto emmit = generate_uniform<int>(1, 1000000, 100);
-    ComprStack<int, std::greater<int>> stack;
-
-    //Act
-    //Assert
-}
-
-TEST(MaxStack, ThridStack)
+TEST(MaxStack, SecondStack)
 {
     //Arrange
     auto emmit = generate_uniform<int>(1, 100, 1000000);
     ComprStack<int, std::greater<int>> stack;
 
     //Act
+    for(auto& var : emmit.first)
+    {
+        stack.cs_push(var);
+    }
+
     //Assert
+    ASSERT_TRUE(!stack.cs_empty());
+    ASSERT_EQ(emmit.first.size(), stack.cs_size());
+    ASSERT_EQ(emmit.second, stack.cs_comp());
+    while(!stack.cs_empty())
+    {
+        stack.cs_pop();
+    }
+    for(auto i = 1; i < emmit.first.size(); ++i)
+    {
+        if(i % 2 == 0)
+        {
+            emmit.first.pop_back();
+        }
+    }
+    std::sort(emmit.first.begin(), emmit.first.end(), std::greater<int>());
+    ASSERT_TRUE(stack.cs_empty());
+    for(auto& var : emmit.first)
+    {
+        stack.cs_push(var);
+    }
+    while(stack.cs_empty() || emmit.first.empty())
+    {
+        stack.cs_pop();
+        emmit.first.pop_back();
+    }
+    ASSERT_EQ(emmit.first.size(), stack.cs_size());
+    ASSERT_EQ(emmit.first[0], stack.cs_comp());
+    ASSERT_EQ(emmit.first.size(), stack.cs_size());
 }
 
 TEST(MinStack, FirstStack)
+{
+    //Arrange
+    constexpr std::size_t SIZE = 100;
+    ComprStack<int, std::less<int>> stack;
+
+    //Act
+    //Assert
+    ASSERT_TRUE(stack.cs_empty());
+    for(std::size_t i = SIZE; i > 0; --i)
+    {
+        stack.cs_push(i);
+        ASSERT_EQ(stack.cs_comp(), i);
+    }
+    ASSERT_EQ(SIZE, stack.cs_size());
+    for(std::size_t i = 0; i < SIZE-1; i++)
+    {
+        ASSERT_EQ(stack.cs_comp(), i+1);
+        stack.cs_pop();
+    }
+    stack.cs_pop();
+    ASSERT_TRUE(stack.cs_empty());
+}
+
+TEST(MinStack, SecondStack)
 {
     //Arrange
     auto emmit = generate_uniform<int, std::less<int>>(1, 100, 1000000);
@@ -93,27 +140,6 @@ TEST(MinStack, FirstStack)
     //Act
     //Assert
 }
-
-TEST(MinStack, SecStack)
-{
-    //Arrange
-    auto emmit = generate_uniform<int, std::less<int>>(1, 1000, 100);
-    ComprStack<int, std::less<int>> stack;
-
-    //Act
-    //Assert
-}
-
-TEST(MinStack, ThridStack)
-{
-    //Arrange
-    auto emmit = generate_uniform<int, std::less<int>>(1, 5, 100);
-    ComprStack<int, std::less<int>> stack;
-
-    //Act
-    //Assert
-}
-
 } //cs_testing
 
 #endif //COMPRSTACK_TEST_H
