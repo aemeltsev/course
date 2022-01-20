@@ -90,8 +90,8 @@ public:
         this->init();
     }
 
-    explicit BHeap(const std::vector<T>& in) noexcept
-        :_data(in)
+    explicit BHeap(const std::vector<T> in) noexcept
+        :_data(std::move(in))
     {
         this->init();
     }
