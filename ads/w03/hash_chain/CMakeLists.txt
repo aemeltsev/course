@@ -28,7 +28,7 @@ add_compile_options(-std=c++17 -g -O2 -Wall -pedantic)
 link_libraries(pthread)
 link_libraries(gtest)
 
-set(HEADERS chhash.h flist.h tests.h)
+set(HEADERS chhash.h llist.h tests.h)
 set(SOURCES main.cpp)
 set(REQUIRED_LIBRARIES pthread gtest)
 

@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include <functional>
 #include "chhash.h"
+#include "llist.h"
 
 namespace chhash
 {
