@@ -6,8 +6,8 @@
 
 class RKM
 {
-    static const std::size_t module = 0x107ULL;
-    static const std::size_t prime = 0x3B9ACA07ULL;
+    static const std::size_t module = 0;
+    static const std::size_t prime = 0x65;
 
     std::string _pattern;
     std::size_t _pattern_size;
@@ -19,7 +19,6 @@ class RKM
     {
         base %= modulo;
         T result = 1;
-
         while (exp > 0)
         {
             if (exp & 1)
@@ -33,13 +32,6 @@ class RKM
         return result;
     }
 
-public:
-    RKM(const std::string& pattern)
-        :_pattern(pattern)
-        ,_pattern_size(pattern.size())
-        ,_diff_hash(pow_mod<std::size_t>(module, static_cast<std::size_t>(_pattern_size - 1), prime))
-    {}
-
     bool compare(const std::string& text, std::size_t offset)
     {
         std::size_t index;
@@ -48,6 +40,13 @@ public:
 
         return index == _pattern_size;
     }
+
+public:
+    RKM(const std::string& pattern)
+        :_pattern(pattern)
+        ,_pattern_size(pattern.size())
+        ,_diff_hash(pow_mod<std::size_t>(module, (_pattern_size - 1), prime))
+    {}
 
     std::vector<std::size_t> rkm(const std::string& text)
     {
@@ -59,17 +58,15 @@ public:
 
         std::size_t pattern_hash = 0;
         std::size_t first_win_hash = 0;
-        std::size_t index = 0;
 
         /* 2. calculate pattern hash(as example "CCD" hash equal 4652275 in ring of the prime value
          *    and calculate first window hash with pattern size(as example "ABCCDDAEFG"
          *    first window - "ABC" and hash - 4513410
          */
-        while(index < _pattern_size)
+        for(std::size_t index = 0; index < _pattern_size; ++index)
         {
             pattern_hash = (module * pattern_hash + _pattern[index]) % prime;
             first_win_hash = (module * first_win_hash + text[index]) % prime;
-            ++index;
         }
 
         /* 3. create contain window hashes vector and push to it first window hash */
@@ -78,7 +75,7 @@ public:
         win_hashes.push_back(first_win_hash);
 
         /* 4. matching */
-        for(index = 0; index <= last_index; ++index)
+        for(std::size_t index = 0; index <= last_index; ++index)
         {
             /* compare pattern hash/window hash and by to character
              *  if equal push index to vector
