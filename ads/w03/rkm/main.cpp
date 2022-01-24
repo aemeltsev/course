@@ -34,7 +34,5 @@ int main()
         std::cout << var << " ";
     }
     std::cout << '\n';
-
-
     return 0;
 }

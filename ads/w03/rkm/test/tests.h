@@ -8,7 +8,7 @@
 #include <functional>
 #include "rkm.h"
 
-namespace chhash
+namespace rkm_test
 {
 
 }
