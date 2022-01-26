@@ -146,7 +146,7 @@ _bst_node<T> *_bst_node<T>::next_larger()
 template <typename T>
 class BST
 {
-    /* using nodes as
+    /* using nodes as tuple {root, l.child index, r.child index}
      *  0 idx -   {4, 1, 2}
      *  1st idx - {1, 3, -1}
      *  2nd idx - {2, -1, -1}
