@@ -34,17 +34,51 @@ class adv_sort
 
     void _merge(std::vector<T>& data, int64_t left, int64_t mid, int64_t right)
     {
+        int64_t i_left = 0;
+        int64_t i_right = 0;
+        std::vector<int64_t> tmp(right - left);
 
+        while(left + i_left < mid && mid + i_right < right)
+        {
+            if(_comparator(data[mid + i_right], data[left + i_left]))
+            {
+                tmp[i_left + i_right] = data[left + i_left];
+                ++i_left;
+            }
+            else{
+                tmp[i_left + i_right] = data[mid + i_right];
+                ++i_right;
+            }
+        }
+        while(left + i_left < mid) {
+            tmp[i_left + i_right] = data[left + i_left];
+            ++i_left;
+        }
+        while(mid + i_right < right) {
+            tmp[i_left + i_right] = data[mid + i_right];
+            ++i_right;
+        }
+        for(int64_t i=0; i<i_left + i_right; ++i)
+        {
+            data[left + i] = tmp[i];
+        }
     }
 
     void _merge_sort(std::vector<T>& data)
     {
-
+        int64_t size = data.size();
+        for(int64_t i = 1; i < size; i <<= 1)
+        {
+            for(int64_t left = 0; left < size - 1; left += (i << 1))
+            {
+                _merge(data, left, left + i, std::min(left + (i << 1), size));
+            }
+        }
     }
 
     int64_t _parent(int64_t i)
     {
-        return (i - 1) >> 2; // i - 1 / 2
+        return (i - 1) >> 1; // i - 1 / 2
     }
 
     int64_t _lchild(int64_t i)
@@ -104,8 +138,8 @@ class adv_sort
         while(end > 0)
         {
             std::swap(data[end], data[0]);
-            end--;
             _sift_down(data, 0, end);
+            --end;
         }
     }
 
@@ -140,12 +174,14 @@ public:
 
     std::vector<T> sort(std::vector<T>& data)
     {
+
         switch(SType)
         {
         case typeSort::HS:
             _heap_sort(data);
             break;
         case typeSort::MS:
+            _merge_sort(data);
             break;
         case typeSort::QS:
             break;
