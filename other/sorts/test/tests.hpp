@@ -21,28 +21,26 @@ void fill_uniform(const T low, const T high, std::vector<T>& result)
 }
 
 template <typename Generator=std::mt19937_64, typename Comparator = std::greater<int>>
-std::pair<std::vector<int>, std::size_t> generate_uniform(const int low, const int high, const std::size_t size)
+std::vector<int> generate_uniform(const int low, const int high, const std::size_t size)
 {
     std::vector<int> result(size);
     Comparator _comparator;
 
     fill_uniform<int>(low, high, result);
 
-    std::sort(result.begin(), result.end(), _comparator);
-
-    return std::make_pair(result, result[0]);
+    return result;
 }
 
 TEST(Sort, Merge)
 {
     //Arrenge
-    auto emmit = generate_uniform<int>(1, 1000, 10);
-    std::vector<int> comp;
-    std::copy(emmit.first.begin(), emmit.first.end(), std::back_inserter(comp));
+    std::vector<int> emmit = generate_uniform(1, 1000, 10);
+    auto& comp = emmit;
+
     collection::adv_sort<int, collection::typeSort::MS> mssort{};
 
     //Act
-    auto result = mssort.sort(emmit.first);
+    auto result = mssort.sort(emmit);
     for(auto& var : result)
     {
         std::cout << var << " ";
@@ -65,18 +63,17 @@ TEST(Sort, Merge)
 TEST(Sort, Heap)
 {
     //Arrenge
-    auto emmit = generate_uniform<int>(1, 1000, 10);
-    //std::vector<int> comp;
-    //std::copy(emmit.first.begin(), emmit.first.end(), std::back_inserter(comp));
+    std::vector<int> emmit = generate_uniform(500, 10000, 10);
+    auto& comp = emmit;
     collection::adv_sort<int, collection::typeSort::HS> hssort{};
 
     //Act
-    auto result = hssort.sort(emmit.first);
+    auto result = hssort.sort(emmit);
     for(auto& var : result)
     {
         std::cout << var << " ";
     }
-    /*std::cout << '\n';
+    std::cout << '\n';
     std::sort(comp.begin(), comp.end());
     for(auto& var : comp)
     {
@@ -89,7 +86,6 @@ TEST(Sort, Heap)
     {
         ASSERT_EQ(result[i], comp[i]);
     }
-    */
 }
 
 TEST(Sort, Quick)

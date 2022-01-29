@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 set(BIN sorts)
 project(${BIN} LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -24,7 +24,7 @@ else()
     message(FATAL_ERROR "Cannot find Google Test package")
 endif()
 
-add_compile_options(-std=c++14 -g -O2 -Wall)
+add_compile_options(-std=c++17 -g -O2 -Wall)
 link_libraries(pthread)
 link_libraries(gtest)
 
