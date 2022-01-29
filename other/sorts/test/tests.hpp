@@ -20,14 +20,11 @@ void fill_uniform(const T low, const T high, std::vector<T>& result)
     std::generate(std::begin(result), std::end(result), [&] () { return dist(gen); });
 }
 
-template <typename Generator=std::mt19937_64, typename Comparator = std::greater<int>>
+template <typename Generator=std::mt19937_64>
 std::vector<int> generate_uniform(const int low, const int high, const std::size_t size)
 {
     std::vector<int> result(size);
-    Comparator _comparator;
-
     fill_uniform<int>(low, high, result);
-
     return result;
 }
 
@@ -53,8 +50,8 @@ TEST(Sort, Merge)
     }
 
     //Assert
-    ASSERT_EQ(result.size(), comp.size());
-    for(int i = 0; i < result.size(); ++i)
+    ASSERT_EQ(*(result.begin()), *(comp.begin()));
+    for(std::size_t i = 0; i < result.size(); ++i)
     {
         ASSERT_EQ(result[i], comp[i]);
     }
@@ -81,8 +78,7 @@ TEST(Sort, Heap)
     }
 
     //Assert
-    ASSERT_EQ(result.size(), comp.size());
-    for(int i = 0, j = 0; i < result.size() && j < comp.size(); ++i, ++j)
+    for(std::size_t i = 0; i < result.size(); ++i)
     {
         ASSERT_EQ(result[i], comp[i]);
     }

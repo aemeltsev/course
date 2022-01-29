@@ -30,6 +30,7 @@ template< typename T,
           typename Comparator = std::greater<T>>
 class adv_sort
 {
+    static constexpr int QS_MIN_SIZE = 0xA;
     Comparator _comparator;
 
     void _merge(std::vector<T>& data, int64_t left, int64_t mid, int64_t right)
@@ -143,14 +144,41 @@ class adv_sort
         }
     }
 
-    int64_t _partition(std::vector<T>& data, int64_t left, int64_t right)
+    int64_t _partition(std::vector<T>& data, int64_t low, int64_t high)
     {
+        auto pivot = data[std::floor((high + low) >> 2)]; //pivot
 
+        int64_t i = low - 1; // index left
+        int64_t j = high + 1; // index right
+
+        while(true)
+        {
+            do{
+                ++i;
+            } while (data[i] < pivot);
+
+            do{
+                --j;
+            } while(data[i] > pivot);
+
+            if(i >=j) return j;
+
+            std::swap(data[i], data[j]);
+        }
     }
 
-    void _quick_sort(std::vector<T>& data)
+    void _quick_sort(std::vector<T>& data , int64_t low, int64_t high)
     {
-
+        if(high - low <= QS_MIN_SIZE)
+        {
+            _insertion_sort(data, low, high);
+            return;
+        }
+        int64_t median = std::nth_element(data[low], data[(low + high) >> 1], data[high]);
+        std::swap(data[median], data[(low + high) >> 1]);
+        auto i = _partition(data, low, high);
+        _quick_sort(data, low, i);
+        _quick_sort(data, i + 1, high);
     }
 
     int64_t _get_min(int64_t num)
@@ -158,9 +186,44 @@ class adv_sort
 
     }
 
-    void _insertion_sort(std::vector<T>& data, int64_t left, int64_t right)
+    void _insertion_sort(std::vector<T>& data, int64_t left, int64_t right, bool optimise = true)
     {
+        int64_t size = data.size();
 
+        auto bsearch = [&, data]( int64_t key, int64_t left, int64_t right) -> int64_t
+        {
+            while(left < right - 1) {
+                int64_t med = (left + right) >> 1;
+
+                if(data[med] < key)
+                    left = med;
+                else
+                    right = med;
+            }
+            return right;
+        };
+
+        if(optimise)
+        {
+            for(int64_t i = 1; i < size; ++i)
+            {
+                int64_t j = i-1;
+                auto k  = bsearch(data[i], 0, j);
+                for(auto m = j; m < k; ++m)
+                    std::swap(data[m], data[m + 1]);
+            }
+        }
+        else{
+            for(int64_t i = 1; i < size; ++i)
+            {
+                int64_t j = i-1;
+                while(j >= 0 && data[j] > data[j + 1])
+                {
+                    std::swap(data[j], data[j + 1]);
+                    --j;
+                }
+            }
+        }
     }
 
     void _tim_sort(std::vector<T>& data)
@@ -184,6 +247,7 @@ public:
             _merge_sort(data);
             break;
         case typeSort::QS:
+            _quick_sort(data, 0, data.size()-1);
             break;
         case typeSort::TS:
             break;
