@@ -87,12 +87,30 @@ TEST(Sort, Heap)
 TEST(Sort, Quick)
 {
     //Arrenge
+    std::vector<int> emmit = generate_uniform(50, 500, 10);
+    auto& comp = emmit;
 
-    //collection::adv_sort<int, collection::typeSort::QS> qssort{};
+    collection::adv_sort<int, collection::typeSort::QS> qssort{};
 
     //Act
+    auto result = qssort.sort(emmit);
+    for(auto& var : result)
+    {
+        std::cout << var << " ";
+    }
+    std::cout << '\n';
+    std::sort(comp.begin(), comp.end());
+    for(auto& var : comp)
+    {
+        std::cout << var << " ";
+    }
 
     //Assert
+    ASSERT_EQ(*(result.begin()), *(comp.begin()));
+    for(std::size_t i = 0; i < result.size(); ++i)
+    {
+        ASSERT_EQ(result[i], comp[i]);
+    }
 }
 
 TEST(Sort, Tim)

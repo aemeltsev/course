@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 #include <functional>
+#include <algorithm>
 
 namespace collection {
 
@@ -146,7 +147,7 @@ class adv_sort
 
     int64_t _partition(std::vector<T>& data, int64_t low, int64_t high)
     {
-        auto pivot = data[std::floor((high + low) >> 2)]; //pivot
+        auto pivot = data[std::floor((high + low) >> 1)]; //pivot
 
         int64_t i = low - 1; // index left
         int64_t j = high + 1; // index right
@@ -167,15 +168,18 @@ class adv_sort
         }
     }
 
-    void _quick_sort(std::vector<T>& data , int64_t low, int64_t high)
+    void _quick_sort(std::vector<T>& data, int64_t low, int64_t high)
     {
         if(high - low <= QS_MIN_SIZE)
         {
-            _insertion_sort(data, low, high);
+            _insertion_sort(data, low, high, false);
             return;
         }
-        int64_t median = std::nth_element(data[low], data[(low + high) >> 1], data[high]);
-        std::swap(data[median], data[(low + high) >> 1]);
+
+        //TODO heuristic
+        //int64_t med = median(data[low], data[(low + higha) >> 1], data[high]);
+        //std::swap(data[med], data[(low + higha) >> 1]);
+
         auto i = _partition(data, low, high);
         _quick_sort(data, low, i);
         _quick_sort(data, i + 1, high);
