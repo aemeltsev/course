@@ -11,6 +11,20 @@ namespace collection {
 static constexpr int QS_MIN_SIZE = 0xA;
 
 template<typename T>
+void _insertion_sort(T data[], std::size_t left, std::size_t right)
+{
+    for(std::size_t i = left; i <= right; ++i)
+    {
+        std::size_t j = i-1;
+        while(j >= 0 && data[j] > data[j + 1])
+        {
+            std::swap(data[j], data[j + 1]);
+            --j;
+        }
+    }
+}
+
+template<typename T>
 void _merge(T data[], std::size_t left, std::size_t mid, std::size_t right)
 {
     std::size_t i = 0;
@@ -133,97 +147,73 @@ void _heap_sort(T data[], const std::size_t& size)
 }
 
 template<typename T>
-int64_t _partition(std::vector<T>& data, int64_t low, int64_t high)
+std::size_t _partition(T data[], std::size_t low, std::size_t high)
 {
-    auto pivot = data[std::floor((high + low) >> 1)]; //pivot
+    std::size_t pivot = data[((high + low) >> 1)]; //pivot
 
-    int64_t i = low - 1; // index left
-    int64_t j = high + 1; // index right
+    std::size_t i = low; // index left
+    std::size_t j = high; // index right
 
-    while(true)
+    while(i <= j)
     {
-        do{
-            ++i;
-        } while (data[i] < pivot);
+        while (data[i] < pivot)
+            i++;
 
-        do{
-            --j;
-        } while(data[i] > pivot);
+        while(data[j] > pivot)
+            j--;
 
-        if(i >=j) return j;
+        if(i >=j) break;
 
-        std::swap(data[i], data[j]);
+        std::swap(data[i++], data[j--]);
     }
+    return j;
 }
 
 template<typename T>
-void _quick_sort(std::vector<T>& data, int64_t low, int64_t high)
+void _quick_sort(T data[], std::size_t low, std::size_t high)
 {
     if(high - low <= QS_MIN_SIZE)
     {
-        _insertion_sort(data, false);
+        _insertion_sort(data, low, high);
         return;
     }
 
-    //TODO heuristic
-    //int64_t med = median(data[low], data[(low + higha) >> 1], data[high]);
-    //std::swap(data[med], data[(low + higha) >> 1]);
+    auto median = [&, data](std::size_t low, std::size_t mid, std::size_t high) -> std::size_t
+    {
+        if(data[low] > data[mid])
+        {
+            if(data[high] > data[low])
+            {
+                return low;
+            }
+            return (data[mid] < data[high]) ? mid : high;
+        }
+        if(data[high] > data[mid])
+        {
+            return mid;
+        }
+        return (data[low] < data[high]) ? mid : high;
+    };
 
-    auto i = _partition(data, low, high);
+
+    // heuristic
+    std::size_t med = median(data[low], data[(low + high) >> 1], data[high]);
+    std::swap(data[med], data[(low + high) >> 1]);
+
+    std::size_t i = _partition(data, low, high);
     _quick_sort(data, low, i);
     _quick_sort(data, i + 1, high);
 }
 
 int64_t _get_min(int64_t num)
 {
-
-}
-
-template<typename T>
-void _insertion_sort(std::vector<T>& data, bool optimise = true)
-{
-    int64_t size = data.size();
-
-    auto bsearch = [&, data]( int64_t key, int64_t left, int64_t right) -> int64_t
-    {
-        while(left < right - 1) {
-            int64_t med = (left + right) >> 1;
-
-            if(data[med] < key)
-                left = med;
-            else
-                right = med;
-        }
-        return right;
-    };
-
-    if(optimise)
-    {
-        for(int64_t i = 1; i < size; ++i)
-        {
-            int64_t j = i-1;
-            auto k  = bsearch(data[i], 0, j);
-            for(auto m = j; m < k; ++m)
-                std::swap(data[m], data[m + 1]);
-        }
-    }
-    else{
-        for(int64_t i = 1; i < size; ++i)
-        {
-            int64_t j = i-1;
-            while(j >= 0 && data[j] > data[j + 1])
-            {
-                std::swap(data[j], data[j + 1]);
-                --j;
-            }
-        }
-    }
+//TODO
 }
 
 template<typename T>
 void _tim_sort(std::vector<T>& data)
 {
-
+//TODO
 }
 
 } //namespace collection
