@@ -50,37 +50,38 @@ void _merge(T data[], std::size_t left, std::size_t mid, std::size_t right)
 }
 
 template<typename T>
-void _merge_sort(T data[], std::size_t size)
+void _merge_sort(T data[], const std::size_t& size)
 {
-    for(std::size_t i = 1; i < size; i <<= 1)
+    std::size_t arr_size = size;
+    for(std::size_t i = 1; i < arr_size; i <<= 1)
     {
-        for(std::size_t left = 0; left < size - i; left += (i << 1))
+        for(std::size_t left = 0; left < arr_size - i; left += (i << 1))
         {
-            _merge(data, left, left + i, std::min(left + (i << 1), size));
+            _merge(data, left, left + i, std::min(left + (i << 1), arr_size));
         }
     }
 }
 
-int64_t _parent(int64_t i)
+std::size_t _parent(std::size_t& i)
 {
     return (i - 1) >> 1; // i - 1 / 2
 }
 
-int64_t _lchild(int64_t i)
+std::size_t _lchild(std::size_t& i)
 {
     return (i << 1) + 1; // 2 * i + 1
 }
 
-int64_t _rchild(int64_t i)
+std::size_t _rchild(std::size_t& i)
 {
     return (i << 1) + 2; // 2 * i + 2
 
 }
 
 template<typename T>
-void _shift_down(std::vector<T>& data, int64_t i, int64_t size)
+void _shift_down(T data[], std::size_t i, const std::size_t& size)
 {
-    int64_t big, left, right;
+    std::size_t big, left, right;
 
     while (i < size)
     {
@@ -88,12 +89,12 @@ void _shift_down(std::vector<T>& data, int64_t i, int64_t size)
         left = _lchild(i);
         right = _rchild(i);
         //left child compare
-        if(left < size && _comparator(data[left], data[big]))
+        if(left < size && data[left] > data[big])
         {
             big = left;
         }
         //right child compare
-        if(right < size && _comparator(data[right], data[big]))
+        if(right < size && data[right] > data[big])
         {
             big = right;
         }
@@ -107,21 +108,21 @@ void _shift_down(std::vector<T>& data, int64_t i, int64_t size)
 }
 
 template<typename T>
-void _build_heap(std::vector<T>& data)
+void _build_heap(T data[], const std::size_t& size)
 {
-    int64_t start = (data.size() >> 1) - 1;
+    int64_t start = (size >> 1) - 1;
     while(start >= 0)
     {
-        _shift_down(data, start, data.size());
+        _shift_down(data, start, size);
         --start;
     }
 }
 
 template<typename T>
-void _heap_sort(std::vector<T>& data)
+void _heap_sort(T data[], const std::size_t& size)
 {
-    _build_heap(data);
-    int64_t end = data.size() - 1;
+    _build_heap(data, size);
+    int64_t end = size - 1;
 
     while(end > 0)
     {
