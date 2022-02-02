@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <cmath>
+#include <cassert>
 #include <functional>
 #include <algorithm>
 
-namespace collection {
+namespace sorting {
 
 static constexpr int QS_MIN_SIZE = 0xA;
+static constexpr int TS_MIN_MERGE = 0x20;
 
 template<typename T>
 void _insertion_sort(T data[], std::size_t left, std::size_t right)
@@ -178,6 +180,7 @@ void _quick_sort(T data[], std::size_t low, std::size_t high)
         return;
     }
 
+    // see: https://ru.stackoverflow.com/questions/446550/quicksort-метод-медианы-из-трех
     auto median = [&, data](std::size_t low, std::size_t mid, std::size_t high) -> std::size_t
     {
         if(data[low] > data[mid])
@@ -195,7 +198,6 @@ void _quick_sort(T data[], std::size_t low, std::size_t high)
         return (data[low] < data[high]) ? mid : high;
     };
 
-
     // heuristic
     std::size_t med = median(data[low], data[(low + high) >> 1], data[high]);
     std::swap(data[med], data[(low + high) >> 1]);
@@ -205,15 +207,39 @@ void _quick_sort(T data[], std::size_t low, std::size_t high)
     _quick_sort(data, i + 1, high);
 }
 
-int64_t _get_min(int64_t num)
+std::size_t _get_min(std::size_t num)
 {
-//TODO
+    auto flag = 0;
+    while(num >= 64)
+    {
+        flag |= num & 1;
+        num >>= 1;
+    }
+    return num + flag;
 }
 
 template<typename T>
-void _tim_sort(std::vector<T>& data)
+void _tim_sort(T data[], std::size_t size)
 {
-//TODO
+    std::size_t run = TS_MIN_MERGE;
+    for(std::size_t i = 0; i < size; i += TS_MIN_MERGE)
+    {
+        _insertion_sort(data, i, std::min((i + run-1), (size - 1)));
+    }
+
+    for(std::size_t j = TS_MIN_MERGE; j < size; j <<= 1)
+    {
+        for(std::size_t left = 0; left < size; left += (j << 1))
+        {
+            std::size_t mid = left + j - 1;
+            std::size_t right = std::min((left + (j << 1) - 1), (size - 1));
+
+            if(mid < right)
+            {
+                _merge(data, left, mid, right);
+            }
+        }
+    }
 }
 
 } //namespace collection

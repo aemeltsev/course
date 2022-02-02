@@ -27,20 +27,8 @@ TEST(Sort, Merge)
     }
 
     //Act
-    collection::_merge_sort(emmit, ARR_SIZE);
+    sorting::_merge_sort(emmit, ARR_SIZE);
     std::sort(comp.begin(), comp.end());
-
-    /*for(std::size_t i=0; i<ARR_SIZE; ++i)
-    {
-        std::cout << emmit[i] << " ";
-    }
-
-    std::cout << '\n';
-
-    for(auto& var : comp)
-    {
-        std::cout << var << " ";
-    }*/
 
     //Assert
     for(std::size_t i = 0; i < ARR_SIZE; ++i)
@@ -64,20 +52,8 @@ TEST(Sort, Heap)
     }
 
     //Act
-    collection::_heap_sort(emmit, ARR_SIZE);
+    sorting::_heap_sort(emmit, ARR_SIZE);
     std::sort(comp.begin(), comp.end());
-
-    /*for(std::size_t i=0; i<ARR_SIZE; ++i)
-    {
-        std::cout << emmit[i] << " ";
-    }
-
-    std::cout << '\n';
-
-    for(auto& var : comp)
-    {
-        std::cout << var << " ";
-    }*/
 
     //Assert
     for(std::size_t i = 0; i < ARR_SIZE; ++i)
@@ -89,42 +65,53 @@ TEST(Sort, Heap)
 
 TEST(Sort, Quick)
 {
-/*    //Arrenge
-    std::vector<int> emmit = generate_uniform(50, 500, 10);
-    auto& comp = emmit;
+    //Arrenge
+    int* emmit = new int[ARR_SIZE];
+    std::vector<int> comp;
+    comp.reserve(ARR_SIZE);
 
-    collection::adv_sort<int, collection::typeSort::QS> qssort{};
+    for(std::size_t i=ARR_SIZE, j = 0; i>0 && j<ARR_SIZE; --i, ++j)
+    {
+        emmit[j] = i;
+        comp.push_back(i);
+    }
 
     //Act
-    auto result = qssort.sort(emmit);
-//    for(auto& var : result)
-//    {
-//        std::cout << var << " ";
-//    }
-//    std::cout << '\n';
+    sorting::_quick_sort(emmit, 1, ARR_SIZE-1);
     std::sort(comp.begin(), comp.end());
-//    for(auto& var : comp)
-//    {
-//        std::cout << var << " ";
-//    }
 
     //Assert
-    ASSERT_EQ(*(result.begin()), *(comp.begin()));
-    for(std::size_t i = 0; i < result.size(); ++i)
+    for(std::size_t i = 0; i < ARR_SIZE; ++i)
     {
-        ASSERT_EQ(result[i], comp[i]);
-    }*/
+        ASSERT_EQ(emmit[i], comp[i]);
+    }
+    delete[] emmit;
 }
 
 TEST(Sort, Tim)
 {
     //Arrenge
+    static const std::size_t TS_SIZE = 100000;
+    int* emmit = new int[TS_SIZE];
+    std::vector<int> comp;
+    comp.reserve(TS_SIZE);
 
-    //collection::adv_sort<int, collection::typeSort::TS> tssort{};
+    for(std::size_t i=TS_SIZE, j = 0; i>0 && j<TS_SIZE; --i, ++j)
+    {
+        emmit[j] = i;
+        comp.push_back(i);
+    }
 
     //Act
+    sorting::_tim_sort(emmit, TS_SIZE);
+    std::sort(comp.begin(), comp.end());
 
     //Assert
+    for(std::size_t i = 0; i < TS_SIZE; ++i)
+    {
+        ASSERT_EQ(emmit[i], comp[i]);
+    }
+    delete[] emmit;
 }
 
 } // namespace adv_sort_test
