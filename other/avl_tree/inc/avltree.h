@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+namespace tree {
+
 template<typename T>
 class _tnode
 {
@@ -44,6 +46,7 @@ public:
 
     int update_height();
     int get_balance();
+    bool is_leaf();
 
     _tnode* get_parent(){return this->_parent;}
     _tnode* get_left_child(){return this->_left_child;}
@@ -121,6 +124,12 @@ _tnode<T>* _tnode<T>::set_right_child(_tnode<T>* new_right)
     _right_child = new_right;
     update_height();
     return _right_child;
+}
+
+template<typename T>
+bool _tnode<T>::is_leaf()
+{
+    return this->get_left_child() == nullptr && this->get_right_child() == nullptr;
 }
 
 template<typename T>
@@ -395,6 +404,94 @@ void AVLTree<T>::insert(const T& key)
 template<typename T>
 void AVLTree<T>::remove(T &key)
 {
+    // empty tree
+    if(_root == nullptr) return;
+    // find node to be deleted
+    _tnode<T>* rem_node = find(key);
+    if(rem_node == nullptr) return;
+
+    _tnode<T> *replace, *replace_parent, *tmp;
+    // get parent of a node to be removed
+    _tnode<T>* rem_node_parent = rem_node->get_parent();
+    bool left_side = false;
+    bool right_side = false;
+
+    if(rem_node_parent != nullptr)
+    {
+        (rem_node_parent->get_left_child() == rem_node) ? left_side = true
+                                                        : right_side = true;
+    }
+
+    int balance = rem_node->get_balance();
+
+    // no child case - node is leaf
+    if(rem_node->is_leaf())
+    {
+        // if parent exist
+        if(rem_node_parent != nullptr)
+        {
+            if(left_side)
+                rem_node_parent->set_left_child(nullptr);
+            else
+                rem_node_parent->set_right_child(nullptr);
+
+            delete rem_node;
+            rem_node_parent->update_height();
+            _balance_node(rem_node_parent);
+        }
+        else
+        {
+            // rem_node - root
+            _set_root(nullptr);
+            delete rem_node;
+        }
+    }
+    else if(rem_node->get_right_child() == nullptr)
+    {
+        // if exist one left child
+        // if parent exist
+        if(rem_node_parent != nullptr)
+        {
+            if(left_side)
+                rem_node_parent->set_left_child(rem_node->get_left_child());
+            else
+                rem_node_parent->set_right_child(rem_node->get_left_child());
+
+            delete rem_node;
+            rem_node_parent->update_height();
+            _balance_node(rem_node_parent);
+        }
+        else
+        {
+            _set_root(rem_node->get_left_child());
+            delete rem_node;
+        }
+    }
+    else if(rem_node->get_left_child() == nullptr)
+    {
+        // if exist one right child
+        // if parent exist
+        if(rem_node_parent != nullptr)
+        {
+            if(left_side)
+                rem_node_parent->set_left_child(rem_node->get_right_child());
+            else
+                rem_node_parent->set_right_child(rem_node->get_right_child());
+
+            delete rem_node;
+            rem_node_parent->update_height();
+            _balance_node(rem_node_parent);
+        }
+        else
+        {
+            _set_root(rem_node->get_right_child());
+            delete rem_node;
+        }
+    }
+    else
+    {
+
+    }
 
 }
 
@@ -413,5 +510,7 @@ _tnode<T>* AVLTree<T>::find(const T& val)
     }
     return nullptr;
 }
+
+} //namespace tree
 
 #endif // AVLTREE_H
