@@ -1,7 +1,7 @@
 #ifndef AVLTREE_H
 #define AVLTREE_H
 
-#include <memory>
+#include <cstdint>
 
 template<typename T>
 class _tnode
@@ -23,6 +23,20 @@ public:
         :_data(val)
         ,_height(0)
 
+    {}
+
+    explicit _tnode(const T& val)
+        :_data(val)
+        ,_height(0)
+
+    {}
+
+    _tnode(T& key, int height, _tnode* parent, _tnode* left_child, _tnode* _right_child)
+        :_data(key)
+        ,_height(height)
+        ,_parent(parent)
+        ,_left_child(left_child)
+        ,_right_child(_right_child)
     {}
 
     T get_data(){return _data;}
@@ -75,7 +89,7 @@ int _tnode<T>::get_balance()
 {
     if(this->get_left_child() != nullptr && this->get_right_child() != nullptr)
     {
-        return this->get_left_child()->get_height() - this->getRightChild()->get_height();
+        return this->get_left_child()->get_height() - this->get_right_child()->get_height();
     }
     else if(this->get_left_child() != nullptr)
     {
@@ -93,7 +107,7 @@ int _tnode<T>::get_balance()
 template<typename T>
 _tnode<T>* _tnode<T>::set_left_child(_tnode<T>* new_left)
 {
-    if(new_left != nullptr) new_left->parent = this;
+    if(new_left != nullptr) new_left->_parent = this;
 
     _left_child = new_left;
     update_height();
@@ -103,7 +117,7 @@ _tnode<T>* _tnode<T>::set_left_child(_tnode<T>* new_left)
 template<typename T>
 _tnode<T>* _tnode<T>::set_right_child(_tnode<T>* new_right)
 {
-    if(new_right != 0) new_right->parent = this;
+    if(new_right != 0) new_right->_parent = this;
     _right_child = new_right;
     update_height();
     return _right_child;
@@ -114,12 +128,27 @@ class AVLTree
 {
 private:
     _tnode<T>* _root;
-    std::size_t _size;
+    std::size_t _size{0};
+    static _tnode<T>* _copy_nodes(_tnode<T>* node)
+    {
+        if(node != nullptr)
+        {
+            _tnode<T>* parent = _copy_nodes(node->get_parent());
+            _tnode<T>* left = _copy_nodes(node->get_left_child());
+            _tnode<T>* right = _copy_nodes(node->get_right_child());
+            return new _tnode<T>(node->get_data(), node->get_height(), parent, left, right);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
 
     void _set_root(_tnode<T>* node);
     void _rotate_left(_tnode<T>* node);
     void _rotate_right(_tnode<T>* node);
-    void balance_node(_tnode<T>* node);
+    void _balance_node(_tnode<T>* node);
+    void _delete_tree(_tnode<T>* node);
 
 public:
 
@@ -135,8 +164,31 @@ public:
             ,_avlt(&avl)
         {}
 
-    };
+        const T& operator*() const {return _itnode->get_data();}
+        const T& operator->()const {return _itnode->get_data();}
+        Iterator& operator++();
+        Iterator& operator--();
+        Iterator operator++(int);
+        Iterator operator--(int);
+        Iterator& operator+=(int i);
+        Iterator& operator-=(int i);
+        Iterator up() {_itnode = _itnode->get_parent(); return *this;}
+        Iterator left() {_itnode = _itnode->get_left_child(); return *this;}
+        Iterator right() {_itnode = _itnode->get_right_child(); return *this;}
 
+        operator bool() {return _itnode != nullptr;}
+
+        bool operator==(const Iterator& itr)
+        {
+            return _itnode == itr._itnode && _avlt == itr._avlt;
+        }
+
+        bool operator!=(const Iterator& itr)
+        {
+            return _itnode != itr._itnode || _avlt != itr._avlt;
+        }
+
+    };
 
     AVLTree()
         :_root(nullptr)
@@ -149,26 +201,29 @@ public:
 
     AVLTree(const AVLTree& other)
     {
-
+        if(this != &other)
+        {
+            _root = _copy_nodes(other._root);
+        }
     }
-
+    /*
     const AVLTree& operator=(const AVLTree& other)
     {
 
-    }
+    }*/
 
     ~AVLTree()
     {
-
+        _delete_tree(_root);
+        delete _root;
     }
 
     void clear();
     void insert(const T& key);
-    void remove(const T& key);
+    void remove(T& key);
     _tnode<T>* find(const T& val);
-    std::size_t size() const {return _size;}
     bool empty() const {return _size == 0;}
-    std::size_t height(){return (_root ? _root->get_height() : 0);}
+    std::size_t size()const {return _size;}
 };
 
 template<typename T>
@@ -197,7 +252,6 @@ void AVLTree<T>::_rotate_left(_tnode<T>* node)
     node->set_right_child(temp->get_left_child());
     temp->set_left_child(node);
 
-    // Now attach the subtree to the parent (or root)
     if(parent)
     {
         if(left)
@@ -230,7 +284,6 @@ void AVLTree<T>::_rotate_right(_tnode<T>* node)
     node->set_left_child(temp->get_right_child());
     temp->set_right_child(node);
 
-    // Now attach the subtree to the parent (or root)
     if(parent)
     {
         if(left)
@@ -245,7 +298,7 @@ void AVLTree<T>::_rotate_right(_tnode<T>* node)
 }
 
 template<typename T>
-void AVLTree<T>::balance_node(_tnode<T>* node)
+void AVLTree<T>::_balance_node(_tnode<T>* node)
 {
     auto balance = node->get_balance();
 
@@ -261,6 +314,88 @@ void AVLTree<T>::balance_node(_tnode<T>* node)
             _rotate_right(node->get_right_child());
         _rotate_left(node);
     }
+}
+
+template<typename T>
+void AVLTree<T>::_delete_tree(_tnode<T>* node)
+{
+    if(node)
+    {
+        _delete_tree(node->get_left_child());
+        _delete_tree(node->get_right_child());
+        delete node;
+    }
+}
+
+template<typename T>
+void AVLTree<T>::clear()
+{
+    _delete_tree(_root);
+}
+
+template<typename T>
+void AVLTree<T>::insert(const T& key)
+{
+    _tnode<T>* add_node;
+    // basic case: if empty tree - insert in to _root node
+    if(!_root)
+    {
+        _root = new _tnode<T>(key);
+        _size++;
+    }
+    else
+    {
+        auto tmp = _root;
+        // iterative descend and search parrent node
+        while(true)
+        {
+            // insert to left sub-tree
+            if(key < tmp->get_data())
+            {
+                if(tmp->get_left_child() == nullptr)
+                {
+                    add_node = tmp->set_left_child(new _tnode<T>(key));
+                    break;
+                }
+                else
+                {
+                    tmp = tmp->get_left_child();
+                }
+            }
+            // insert to right sub-tree
+            else if(key > tmp->get_data())
+            {
+                if(tmp->get_right_child() == nullptr)
+                {
+                    add_node = tmp->set_right_child(new _tnode<T>(key));
+                    break;
+                }
+                else
+                {
+                    tmp = tmp->get_right_child();
+                }
+            }
+            else
+            {
+                return;
+            }
+        }
+        tmp = add_node;
+        _size++;
+        // iterative ascend - update height and rebalance
+        while(tmp != nullptr)
+        {
+            tmp->update_height();
+            _balance_node(tmp);
+            tmp = tmp->get_parent();
+        }
+    }
+}
+
+template<typename T>
+void AVLTree<T>::remove(T &key)
+{
+
 }
 
 template<typename T>
