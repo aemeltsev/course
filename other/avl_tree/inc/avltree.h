@@ -2,6 +2,7 @@
 #define AVLTREE_H
 
 #include <cstdint>
+#include <iterator>
 
 namespace tree {
 
@@ -161,40 +162,130 @@ private:
 
 public:
 
-    template<typename Y>
     class Iterator
+            :public std::iterator<std::bidirectional_iterator_tag, T>
     {
-        _tnode<Y>* _itnode;
-        const AVLTree<Y>* _avlt;
+        friend class AVLTree<T>;
+        _tnode<T>* _itnode;
+        const AVLTree<T>* _tree;
+
+        Iterator up() {_itnode = _itnode->get_parent(); return *this;}
+        Iterator left() {_itnode = _itnode->get_left_child(); return *this;}
+        Iterator right() {_itnode = _itnode->get_right_child(); return *this;}
+
     public:
 
-        Iterator(_tnode<Y>* node, const AVLTree<Y>& avl)
+        Iterator(_tnode<T>* node, const AVLTree<T>* tree)
             :_itnode(node)
-            ,_avlt(&avl)
+            ,_tree(tree)
         {}
 
         const T& operator*() const {return _itnode->get_data();}
         const T& operator->()const {return _itnode->get_data();}
-        Iterator& operator++();
-        Iterator& operator--();
+
+        Iterator& operator++()
+        {
+            _tnode<T>* tmp;
+
+            if(_itnode == nullptr)
+            {
+                _itnode = _tree->_root;
+                if(_itnode == nullptr)
+                {
+                    throw "Out of range";
+                }
+
+                while(_itnode->get_left_child() != nullptr)
+                {
+                    _itnode = _itnode->get_left_child();
+                }
+            }
+            else
+            {
+                if(_itnode->get_right_child() != nullptr)
+                {
+                    _itnode = _itnode->get_right_child();
+
+                    while(_itnode->get_left_child() != nullptr)
+                    {
+                        _itnode = _itnode->get_left_child();
+                    }
+                }
+                else
+                {
+                    tmp = _itnode->get_parent();
+
+                    while(tmp != nullptr && _itnode == tmp->get_right_child())
+                    {
+                        _itnode = tmp;
+                        tmp = tmp->get_parent();
+                    }
+
+                    _itnode = tmp;
+                }
+            }
+            return *this;
+        }
+
+        Iterator& operator--()
+        {
+            _tnode<T>* tmp;
+
+            if(_itnode == nullptr)
+            {
+                _itnode = _tree->_root;
+                if(_itnode == nullptr)
+                {
+                    throw "Out of range";
+                }
+
+                while(_itnode->get_right_child() != nullptr)
+                {
+                    _itnode = _itnode->get_right_child();
+                }
+            }
+            else
+            {
+                if(_itnode->get_left_child() != nullptr)
+                {
+                    _itnode = _itnode->get_left_child();
+
+                    while(_itnode->get_right_child() != nullptr)
+                    {
+                        _itnode = _itnode->get_right_child();
+                    }
+                }
+                else
+                {
+                    tmp = _itnode->get_parent();
+
+                    while(tmp != nullptr && _itnode == tmp->get_left_child())
+                    {
+                        _itnode = tmp;
+                        tmp = tmp->get_parent();
+                    }
+
+                    _itnode = tmp;
+                }
+            }
+            return *this;
+        }
+
         Iterator operator++(int);
         Iterator operator--(int);
         Iterator& operator+=(int i);
         Iterator& operator-=(int i);
-        Iterator up() {_itnode = _itnode->get_parent(); return *this;}
-        Iterator left() {_itnode = _itnode->get_left_child(); return *this;}
-        Iterator right() {_itnode = _itnode->get_right_child(); return *this;}
 
         operator bool() {return _itnode != nullptr;}
 
         bool operator==(const Iterator& itr)
         {
-            return _itnode == itr._itnode && _avlt == itr._avlt;
+            return _itnode == itr._itnode && _tree == itr._tree;
         }
 
         bool operator!=(const Iterator& itr)
         {
-            return _itnode != itr._itnode || _avlt != itr._avlt;
+            return _itnode != itr._itnode || _tree != itr._tree;
         }
 
     };
@@ -490,9 +581,73 @@ void AVLTree<T>::remove(T &key)
     }
     else
     {
+        if(balance > 0)
+        {
+            if(rem_node->get_left_child()->get_right_child() == nullptr)
+            {
+                replace = rem_node->get_left_child();
+                replace->set_right_child(rem_node->get_right_child());
 
+                tmp = replace;
+            }
+            else
+            {
+                replace = rem_node->get_left_child()->get_right_child();
+                while(replace->get_right_child() != nullptr)
+                {
+                    replace = replace->get_right_child();
+                }
+                replace_parent = replace->get_parent();
+                replace_parent->set_right_child(replace->get_left_child());
+
+                tmp = replace_parent;
+
+                replace->set_left_child(rem_node->get_left_child());
+                replace->set_right_child(rem_node->get_right_child());
+            }
+        }
+        else
+        {
+            if(rem_node->get_right_child()->get_left_child() == nullptr)
+            {
+                replace = rem_node->get_right_child();
+                replace->set_left_child(rem_node->get_left_child());
+
+                tmp = replace;
+            }
+            else
+            {
+                replace = rem_node->get_right_child()->get_left_child();
+                while(replace->get_left_child() != nullptr)
+                {
+                    replace = replace->get_left_child();
+                }
+                replace_parent = replace->get_parent();
+                replace_parent->set_left_child(replace->get_right_child());
+
+                tmp = replace_parent;
+
+                replace->set_left_child(rem_node->get_left_child());
+                replace->set_right_child(rem_node->get_right_child());
+            }
+        }
+
+        if(rem_node_parent != nullptr)
+        {
+            if(left_side)
+                rem_node_parent->set_left_child(replace);
+            else
+                rem_node_parent->set_right_child(replace);
+
+            delete rem_node;
+        }
+        else
+        {
+            _set_root(replace);
+            delete rem_node;
+        }
+        _balance_node(tmp);
     }
-
 }
 
 template<typename T>
