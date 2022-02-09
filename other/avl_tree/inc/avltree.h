@@ -349,22 +349,13 @@ typename AVLTree<T>::Iterator AVLTree<T>::Iterator::operator--(int)
 template<typename T>
 typename AVLTree<T>::Iterator &AVLTree<T>::Iterator::operator+=(std::size_t i)
 {
-    if(!_itnode && i < 0)
-    {
-        ++i;
-        operator++();
-    }
-
-    while(i && _itnode)
-    {
-
-    }
+//TODO
 }
 
 template<typename T>
 typename AVLTree<T>::Iterator &AVLTree<T>::Iterator::operator-=(std::size_t i)
 {
-
+//TODO
 }
 
 template<typename T>
@@ -725,7 +716,7 @@ typename AVLTree<T>::Iterator AVLTree<T>::begin()
 template<typename T>
 typename AVLTree<T>::Iterator AVLTree<T>::end()
 {
-
+//TODO
 }
 
 } //namespace tree
