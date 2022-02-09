@@ -175,106 +175,19 @@ public:
 
     public:
 
-        Iterator(_tnode<T>* node, const AVLTree<T>* tree)
+        Iterator(_tnode<T>* node, const AVLTree<T>& tree)
             :_itnode(node)
-            ,_tree(tree)
+            ,_tree(&tree)
         {}
 
         const T& operator*() const {return _itnode->get_data();}
         const T& operator->()const {return _itnode->get_data();}
-
-        Iterator& operator++()
-        {
-            _tnode<T>* tmp;
-
-            if(_itnode == nullptr)
-            {
-                _itnode = _tree->_root;
-                if(_itnode == nullptr)
-                {
-                    throw "Out of range";
-                }
-
-                while(_itnode->get_left_child() != nullptr)
-                {
-                    _itnode = _itnode->get_left_child();
-                }
-            }
-            else
-            {
-                if(_itnode->get_right_child() != nullptr)
-                {
-                    _itnode = _itnode->get_right_child();
-
-                    while(_itnode->get_left_child() != nullptr)
-                    {
-                        _itnode = _itnode->get_left_child();
-                    }
-                }
-                else
-                {
-                    tmp = _itnode->get_parent();
-
-                    while(tmp != nullptr && _itnode == tmp->get_right_child())
-                    {
-                        _itnode = tmp;
-                        tmp = tmp->get_parent();
-                    }
-
-                    _itnode = tmp;
-                }
-            }
-            return *this;
-        }
-
-        Iterator& operator--()
-        {
-            _tnode<T>* tmp;
-
-            if(_itnode == nullptr)
-            {
-                _itnode = _tree->_root;
-                if(_itnode == nullptr)
-                {
-                    throw "Out of range";
-                }
-
-                while(_itnode->get_right_child() != nullptr)
-                {
-                    _itnode = _itnode->get_right_child();
-                }
-            }
-            else
-            {
-                if(_itnode->get_left_child() != nullptr)
-                {
-                    _itnode = _itnode->get_left_child();
-
-                    while(_itnode->get_right_child() != nullptr)
-                    {
-                        _itnode = _itnode->get_right_child();
-                    }
-                }
-                else
-                {
-                    tmp = _itnode->get_parent();
-
-                    while(tmp != nullptr && _itnode == tmp->get_left_child())
-                    {
-                        _itnode = tmp;
-                        tmp = tmp->get_parent();
-                    }
-
-                    _itnode = tmp;
-                }
-            }
-            return *this;
-        }
-
+        Iterator& operator++();
+        Iterator& operator--();
         Iterator operator++(int);
         Iterator operator--(int);
-        Iterator& operator+=(int i);
-        Iterator& operator-=(int i);
+        Iterator& operator+=(std::size_t i);
+        Iterator& operator-=(std::size_t i);
 
         operator bool() {return _itnode != nullptr;}
 
@@ -287,7 +200,6 @@ public:
         {
             return _itnode != itr._itnode || _tree != itr._tree;
         }
-
     };
 
     AVLTree()
@@ -321,10 +233,139 @@ public:
     void clear();
     void insert(const T& key);
     void remove(T& key);
-    _tnode<T>* find(const T& val);
+    Iterator find(const T& val) const;
+    Iterator begin();
+    Iterator end();
     bool empty() const {return _size == 0;}
     std::size_t size()const {return _size;}
 };
+
+template<typename T>
+typename AVLTree<T>::Iterator &AVLTree<T>::Iterator::operator++()
+{
+    _tnode<T>* tmp;
+
+    if(_itnode == nullptr)
+    {
+        _itnode = _tree->_root;
+        if(_itnode == nullptr)
+        {
+            throw "Out of range";
+        }
+
+        while(_itnode->get_left_child() != nullptr)
+        {
+            _itnode = _itnode->get_left_child();
+        }
+    }
+    else
+    {
+        if(_itnode->get_right_child() != nullptr)
+        {
+            _itnode = _itnode->get_right_child();
+
+            while(_itnode->get_left_child() != nullptr)
+            {
+                _itnode = _itnode->get_left_child();
+            }
+        }
+        else
+        {
+            tmp = _itnode->get_parent();
+
+            while(tmp != nullptr && _itnode == tmp->get_right_child())
+            {
+                _itnode = tmp;
+                tmp = tmp->get_parent();
+            }
+
+            _itnode = tmp;
+        }
+    }
+    return *this;
+}
+
+template<typename T>
+typename AVLTree<T>::Iterator &AVLTree<T>::Iterator::operator--()
+{
+    _tnode<T>* tmp;
+
+    if(_itnode == nullptr)
+    {
+        _itnode = _tree->_root;
+        if(_itnode == nullptr)
+        {
+            throw "Out of range";
+        }
+
+        while(_itnode->get_right_child() != nullptr)
+        {
+            _itnode = _itnode->get_right_child();
+        }
+    }
+    else
+    {
+        if(_itnode->get_left_child() != nullptr)
+        {
+            _itnode = _itnode->get_left_child();
+
+            while(_itnode->get_right_child() != nullptr)
+            {
+                _itnode = _itnode->get_right_child();
+            }
+        }
+        else
+        {
+            tmp = _itnode->get_parent();
+
+            while(tmp != nullptr && _itnode == tmp->get_left_child())
+            {
+                _itnode = tmp;
+                tmp = tmp->get_parent();
+            }
+
+            _itnode = tmp;
+        }
+    }
+    return *this;
+}
+
+template<typename T>
+typename AVLTree<T>::Iterator AVLTree<T>::Iterator::operator++(int)
+{
+    auto temp = *this;
+    operator++();
+    return temp;
+}
+
+template<typename T>
+typename AVLTree<T>::Iterator AVLTree<T>::Iterator::operator--(int)
+{
+    auto temp = *this;
+    operator--();
+    return temp;
+}
+
+template<typename T>
+typename AVLTree<T>::Iterator &AVLTree<T>::Iterator::operator+=(std::size_t i)
+{
+    if(!_itnode && i < 0)
+    {
+        ++i;
+        operator++();
+    }
+
+    while(i && _itnode)
+    {
+
+    }
+}
+
+template<typename T>
+typename AVLTree<T>::Iterator &AVLTree<T>::Iterator::operator-=(std::size_t i)
+{
+
+}
 
 template<typename T>
 void AVLTree<T>::_set_root(_tnode<T>* node)
@@ -651,19 +692,40 @@ void AVLTree<T>::remove(T &key)
 }
 
 template<typename T>
-_tnode<T>* AVLTree<T>::find(const T& val)
+typename AVLTree<T>::Iterator AVLTree<T>::find(const T& val) const
 {
     _tnode<T>* temp = _root;
     while(temp)
     {
-        if(val == temp->get_data())
-            return temp;
-        else if(val < temp->get_data())
+        if(val < temp->get_data())
+        {
             temp = temp->get_left_child();
-        else
+        }
+        else if(val > temp->get_data())
+        {
             temp = temp->get_right_child();
+        }
+        else
+            break;
     }
-    return nullptr;
+    return Iterator(temp, *this);
+}
+
+template<typename T>
+typename AVLTree<T>::Iterator AVLTree<T>::begin()
+{
+    _tnode<T> *temp = _root;
+    while(temp && temp->get_left_child() != nullptr)
+    {
+        temp = temp->get_left_child();
+    }
+    return Iterator(temp, *this);
+}
+
+template<typename T>
+typename AVLTree<T>::Iterator AVLTree<T>::end()
+{
+
 }
 
 } //namespace tree

@@ -3,7 +3,7 @@
 
 int main(int argc, char *argv[])
 {
-    AVLTree<int> tr;
+    tree::AVLTree<int> tr;
     tr.insert(5);
     tr.insert(2);
     tr.insert(8);
