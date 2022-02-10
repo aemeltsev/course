@@ -6,40 +6,40 @@
 #include <stack>
 #include <list>
 
-namespace rp
+namespace tree
 {
 struct _rope_node
 {
     char _key;
     std::size_t _size;
-    _rope_node* _left{nullptr};
-    _rope_node* _right{nullptr};
-    _rope_node* _parent{nullptr};
+    _rope_node* _left = nullptr;
+    _rope_node* _right = nullptr;
+    _rope_node* _parent = nullptr;
 
-    _rope_node();
+    _rope_node()
+        :_key(0)
+        ,_size(0)
+    {}
+
     _rope_node(char key,
                std::size_t size,
                _rope_node* left,
                _rope_node* right,
-               _rope_node* parent);
+               _rope_node* parent)
+        :_key(key)
+        ,_size(size)
+        ,_left(left)
+        ,_right(right)
+        ,_parent(parent)
+    {}
+
+    ~_rope_node()
+    {
+        _left = nullptr;
+        _right = nullptr;
+        _parent = nullptr;
+    }
   };
-
-_rope_node::_rope_node()
-    :_key(0)
-    ,_size(0)
-{}
-
-_rope_node::_rope_node(char key,
-                       std::size_t size,
-                       _rope_node* left,
-                       _rope_node* right,
-                       _rope_node* parent)
-    :_key(key)
-    ,_size(size)
-    ,_left(left)
-    ,_right(right)
-    ,_parent(parent)
-{}
 
 class Rope
 {
@@ -48,17 +48,21 @@ class Rope
 
     void _destroy(_rope_node *node);
     void _update(_rope_node* node);
-    void _small_rotation(_rope_node* node);
-    void _big_rotation(_rope_node* node);
+    void _right_rotate(_rope_node* node);
+    void _left_rotation(_rope_node* node);
+    void _splay(_rope_node *&root, _rope_node* node);
+
+
+    //void _small_rotation(_rope_node* node);
+    //void _big_rotation(_rope_node* node);
     _rope_node* _merge(_rope_node* lhs, _rope_node* rhs);
     std::pair<_rope_node*, _rope_node*> _split(_rope_node* node, std::size_t key);
     _rope_node* _find(_rope_node *&root, std::size_t key);
 
-   public:
+public:
     explicit Rope(const std::string& str);
 
     void remove(_rope_node*& root, std::size_t start, std::size_t len);
-    void splay(_rope_node *&root, _rope_node* node);
     void insert(_rope_node*& root, int k, _rope_node*& subString);
     char find(std::size_t index);
     std::string to_string();
@@ -95,11 +99,14 @@ void Rope::_update(_rope_node *node)
     }
 }
 
+// zig rotation for splay method
 void Rope::_small_rotation(_rope_node* node)
 {
+    // get parent node of input node
     _rope_node* par = node->_parent;
     if(par == nullptr) return;
 
+    // get grandparent node of input node
     _rope_node* gr_par = node->_parent->_parent;
     if(par->_left == node)
     {

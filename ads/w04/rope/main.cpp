@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 int main(int argc, char *argv[])
 {
 
-    std::string str = "hlelowrold";
-    rp::Rope rp(str);
+    std::string str = "Only this and nothing more";
+    tree::Rope rp(str);
 
     std::cout << rp.find(2) << '\n';
     std::cout << rp.find(5) << '\n';
