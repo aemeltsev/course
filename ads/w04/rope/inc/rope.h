@@ -47,10 +47,10 @@ class Rope
     _rope_node* _root;
 
     void _destroy(_rope_node *node);
-    void _update(_rope_node* node);
-    void _right_rotate(_rope_node* node);
-    void _left_rotation(_rope_node* node);
-    void _splay(_rope_node *&root, _rope_node* node);
+    void _update(_rope_node *node);
+    void _right_rotation(_rope_node *node, _rope_node *parent);
+    void _left_rotation(_rope_node *node, _rope_node *parent);
+    void _splay(_rope_node *node);
 
 
     //void _small_rotation(_rope_node* node);
@@ -73,109 +73,121 @@ Rope::Rope(const std::string& str)
     :_str(str)
 {
     for(std::size_t i = 0; i < str.length(); ++i)
-    {
-        _rope_node* next = new _rope_node(str[i], 1, nullptr, nullptr, nullptr);
+    {   _rope_node* next = new _rope_node(str[i], 1, nullptr, nullptr, nullptr);
         _root = _merge(_root, next);
     }
 }
 
 void Rope::_update(_rope_node *node)
 {
-    if(!node)
-    {
-        return;
-    }
-
     node->_size = 1 + (node->_left != nullptr ? node->_left->_size : 0)
                     + (node->_right != nullptr ? node->_right->_size : 0);
-
-    if(node->_left != nullptr)
-    {
-        node->_left->_parent = node;
-    }
-    if(node->_right != nullptr)
-    {
-        node->_right->_parent = node;
-    }
 }
 
-// zig rotation for splay method
-void Rope::_small_rotation(_rope_node* node)
+// zig(right rotation)
+void Rope::_right_rotation(_rope_node *node, _rope_node *parent)
 {
-    // get parent node of input node
-    _rope_node* par = node->_parent;
-    if(par == nullptr) return;
-
-    // get grandparent node of input node
-    _rope_node* gr_par = node->_parent->_parent;
-    if(par->_left == node)
+    parent->_left = node->_right;
+    if(parent->_left)
     {
-        //right rotation
-        _rope_node* tmp = node->_right;
-        node->_right = par;
-        par->_left = tmp;
-    }
-    else
-    {
-        //left rotation
-        _rope_node* tmp = node->_left;
-        node->_left = par;
-        par->_right = tmp;
+        parent->_left->_parent = parent;
     }
 
-    _update(par);
+    node->_right = parent;
+    node->_parent = parent->_parent;
+    parent->_parent = node;
+
+    if(node->_parent)
+    {
+        if(node->_parent->_left == parent)
+            node->_parent->_left = node;
+        else
+            node->_parent->_right = node;
+    }
+
+    _update(parent);
     _update(node);
+}
 
-    node->_parent = gr_par;
-    if(gr_par != nullptr)
+// zag(left rotation)
+void Rope::_left_rotation(_rope_node *node, _rope_node *parent)
+{
+    parent->_right = node->_left;
+    if(parent->_right)
     {
-        if(gr_par->_left == par)
+        parent->_right->_parent = parent;
+    }
+
+    node->_left = parent;
+    node->_parent = parent->_parent;
+    parent->_parent = node;
+
+    if(node->_parent)
+    {
+        if(node->_parent->_left == parent)
+            node->_parent->_left = node;
+        else
+            node->_parent->_right = node;
+    }
+
+    _update(parent);
+    _update(node);
+}
+
+void Rope::_splay(_rope_node* node)
+{
+    if(node == nullptr) return;
+
+    if(node->_parent != nullptr)
+    {
+        _rope_node* parent = node->_parent;
+        if(parent->_parent == nullptr)
         {
-            gr_par->_left = node;
+            //zig/zag
+            if(parent->_left == node)
+                _right_rotation(node, parent);
+            else
+                _left_rotation(node, parent);
         }
         else
         {
-            gr_par->_right = node;
+            _rope_node* grandparent = parent->_parent;
+            if(grandparent->_left == parent && parent->_left == node)
+            {
+                // zig-zag
+                _right_rotation(parent, grandparent);
+                _right_rotation(node, parent);
+            }
+            else if(grandparent->_right == parent && parent->_right == node)
+            {
+                // zag-zag
+                _left_rotation(parent, grandparent);
+                _left_rotation(node, parent);
+            }
+            else
+            {
+                if(parent->_left == node)
+                {
+                    // zig-zag
+                    _right_rotation(node, parent);
+                    grandparent->_right = node;
+                    _left_rotation(node, grandparent);
+                }
+                else
+                {
+                    // zag-zig
+                    _left_rotation(node, parent);
+                    grandparent->_left = node;
+                    _right_rotation(node, grandparent);
+                }
+            }
         }
-    }
-}
-
-void Rope::_big_rotation(_rope_node* node)
-{
-    if(node->_parent->_left == node && node->_parent->_parent->_left == node->_parent)
-    {
-        //zig-zig
-        _small_rotation(node->_parent);
-        _small_rotation(node);
-    }
-    else if(node->_parent->_right == node && node->_parent->_parent->_right == node->_parent)
-    {
-        //zig-zig
-        _small_rotation(node->_parent);
-        _small_rotation(node);
+        _splay(node);
     }
     else
     {
-        //zig-zag
-        _small_rotation(node);
-        _small_rotation(node);
+        _root = node;
     }
-}
-
-void Rope::splay(_rope_node*& root, _rope_node* node)
-{
-    if (node == nullptr) return;
-
-    while (node->_parent != nullptr)
-    {
-        if (node->_parent->_parent == nullptr)
-        {
-            _small_rotation(node);
-            break;
-        }
-        _big_rotation(node);
-    }
-    root = node;
 }
 
 _rope_node* Rope::_find(_rope_node*& root, std::size_t key)
