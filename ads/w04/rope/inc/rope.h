@@ -21,6 +21,11 @@ struct _rope_node
         ,_size(0)
     {}
 
+    _rope_node(char key)
+        :_key(key)
+        ,_size(1)
+    {}
+
     _rope_node(char key,
                std::size_t size,
                _rope_node* left,
@@ -39,6 +44,8 @@ struct _rope_node
         _right = nullptr;
         _parent = nullptr;
     }
+
+    char& get_data(){return _key;}
   };
 
 class Rope
@@ -46,37 +53,29 @@ class Rope
     std::string _str;
     _rope_node* _root;
 
-    void _destroy(_rope_node *node);
-    void _update(_rope_node *node);
-    void _right_rotation(_rope_node *node, _rope_node *parent);
-    void _left_rotation(_rope_node *node, _rope_node *parent);
-    void _splay(_rope_node *node);
+    void _destroy(_rope_node* node);
+    void _update(_rope_node* node);
+    void _right_rotation(_rope_node* node, _rope_node* parent);
+    void _left_rotation(_rope_node* node, _rope_node* parent);
+    void _splay(_rope_node* node);
 
-
-    //void _small_rotation(_rope_node* node);
-    //void _big_rotation(_rope_node* node);
     _rope_node* _merge(_rope_node* lhs, _rope_node* rhs);
     std::pair<_rope_node*, _rope_node*> _split(_rope_node* node, std::size_t key);
-    _rope_node* _find(_rope_node *&root, std::size_t key);
+    _rope_node* _find(_rope_node* node, std::size_t key);
+    void _push_back(char ch, _rope_node* node);
+    void _insert(char ch, std::size_t pos, _rope_node* node);
+    void _remove(_rope_node* node);
+    _rope_node* _max_node(_rope_node* node);
 
 public:
-    explicit Rope(const std::string& str);
+    explicit Rope(){}
 
-    void remove(_rope_node*& root, std::size_t start, std::size_t len);
-    void insert(_rope_node*& root, int k, _rope_node*& subString);
+    void remove(std::size_t pos);
+    void insert(char ch, std::size_t pos);
+    void push_back(char ch);
     char find(std::size_t index);
     std::string to_string();
-
 };
-
-Rope::Rope(const std::string& str)
-    :_str(str)
-{
-    for(std::size_t i = 0; i < str.length(); ++i)
-    {   _rope_node* next = new _rope_node(str[i], 1, nullptr, nullptr, nullptr);
-        _root = _merge(_root, next);
-    }
-}
 
 void Rope::_update(_rope_node *node)
 {
@@ -190,54 +189,112 @@ void Rope::_splay(_rope_node* node)
     }
 }
 
-_rope_node* Rope::_find(_rope_node*& root, std::size_t key)
+void Rope::_push_back(char ch, _rope_node *node)
 {
-    _rope_node* tmp = root;
+    if(!node)
+    {
+        _root = new _rope_node(ch, 1, nullptr, nullptr, node);
+    }
+    else
+    {
+        if(node->_right == nullptr)
+        {
+            node->_right = new _rope_node(ch, 1, nullptr, nullptr, node);
+            _splay(node->_right);
+        }
+        else
+        {
+            _push_back(ch, node->_right);
+        }
+    }
+}
+
+void Rope::push_back(char ch)
+{
+    _push_back(ch, _root);
+}
+
+char Rope::find(std::size_t index)
+{
+    return _find(_root, index)->_key;
+}
+
+_rope_node* Rope::_find(_rope_node* node, std::size_t key)
+{
+    _rope_node* tmp = node;
 
     while(tmp != nullptr)
     {
         std::size_t size = (tmp->_left != nullptr) ? tmp->_left->_size : 0;
-        if(key == (++size))
+        if(key == size)
         {
             break;
         }
-        else if(key < (++size))
+        else if(key < size)
         {
             tmp = tmp->_left;
         }
-        else if(key > (++size))
+        else if(key > size)
         {
             tmp = tmp->_right;
             key = key - size - 1;
         }
+        ++size;
     }
-    splay(root, tmp);
+    _splay(tmp);
+    return tmp;
+}
+
+_rope_node* Rope::_max_node(_rope_node *node)
+{
+    if(node == nullptr)
+        return node;
+
+    _rope_node* tmp = node;
+
+    while(tmp != nullptr)
+    {
+        tmp = tmp->_right;
+    }
+
     return tmp;
 }
 
 _rope_node* Rope::_merge(_rope_node *lhs, _rope_node *rhs)
 {
-    if(lhs == nullptr) return rhs;
-    if(rhs == nullptr) return lhs;
 
-    _rope_node* min_right = rhs;
-
-    while(min_right->_left != nullptr)
+    if(lhs == nullptr && rhs == nullptr)
     {
-        min_right = min_right->_left;
+        return nullptr;
     }
-
-    splay(rhs, min_right);
-    rhs->_left = lhs;
-    _update(rhs);
-    return rhs;
+    else if(lhs == nullptr)
+    {
+        rhs->_parent = nullptr;
+        return rhs;
+    }
+    else if(rhs == nullptr)
+    {
+        lhs->_parent = nullptr;
+        return lhs;
+    }
+    else
+    {
+        _rope_node* merged = _max_node(lhs);
+        _splay(merged);
+        merged->_right = rhs;
+        rhs->_parent = merged;
+        _update(merged);
+        return merged;
+    }
 }
 
 std::pair<_rope_node*, _rope_node*> Rope::_split(_rope_node *node, std::size_t key)
 {
     _rope_node* l_node = nullptr;
     _rope_node* r_node = _find(node, key);
-    splay(node, r_node);
+
+    _splay(r_node);
+
     if(r_node == nullptr)
     {
         l_node = node;
@@ -246,38 +303,81 @@ std::pair<_rope_node*, _rope_node*> Rope::_split(_rope_node *node, std::size_t k
 
     l_node = r_node->_left;
     r_node->_left = nullptr;
+
     if(l_node != nullptr)
     {
         l_node->_parent = nullptr;
     }
+
     _update(l_node);
     _update(r_node);
     return {l_node, r_node};
 }
 
-void Rope::remove(_rope_node *&root, std::size_t start, std::size_t len)
+void Rope::_remove(_rope_node *node)
 {
-    auto node_one = _split(root, start);
-    root = node_one.first;
-    _rope_node* l_node = node_one.second;
+    if(!node) return;
 
-    auto node_two = _split(l_node, len-start);
-    l_node = node_two.first;
-    _rope_node* r_node = node_two.second;
-
-    root = _merge(root, r_node);
-    delete l_node;
-
+    if(!node->_left && !node->_right)
+    {
+        delete node;
+        _root = nullptr;
+    }
+    else
+    {
+        _splay(node);
+        _root = _merge(node->_left, node->_right);
+    }
 }
 
-void Rope::insert(_rope_node*& root, int k, _rope_node*& subString)
+void Rope::remove(std::size_t pos)
 {
-    auto tmp = _split(root, k);
-    _rope_node* l_node = tmp.first;
-    _rope_node* r_node = tmp.second;
-    root = _merge(_merge(l_node, subString), r_node);
+    ++pos;
+    _remove(_find(_root, pos));
+}
 
+void Rope::_insert(char ch, std::size_t pos, _rope_node *node)
+{
+    if(!node)
+    {
+        _root = new _rope_node(ch);
+    }
+    else
+    {
+        auto node_index = node->_size;
+        if(node->_right != nullptr)
+            node_index -= node->_right->_size;
 
+        if(pos < node_index)
+        {
+            if(node->_left == nullptr)
+            {
+                node->_left = new _rope_node(ch, 1, nullptr, nullptr, node);
+                _splay(node->_left);
+            }
+            else
+            {
+                _insert(ch, pos, node->_left);
+            }
+        }
+        else
+        {
+            if(node->_right == nullptr)
+            {
+                node->_right = new _rope_node(ch, 1, nullptr, nullptr, node);
+                _splay(node->_right);
+            }
+            else
+            {
+                _insert(ch, pos - node_index, node->_right);
+            }
+        }
+    }
+}
+
+void Rope::insert(char ch, std::size_t pos)
+{
+    _insert(ch, pos, _root);
 }
 
 std::string Rope::to_string()
@@ -309,11 +409,6 @@ std::string Rope::to_string()
         }
     }
     return result;
-}
-
-char Rope::find(std::size_t index)
-{
-    return _find(_root, index)->_key;
 }
 
 } //namespace rp
