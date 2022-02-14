@@ -227,7 +227,6 @@ public:
     ~AVLTree()
     {
         _delete_tree(_root);
-        delete _root;
     }
 
     void clear();
