@@ -16,12 +16,17 @@ int main(int argc, char *argv[])
     std::string str = "Only this and nothing more";
     tree::Rope rp;
 
-    rp.push_back(str[0]);
-    rp.push_back(str[1]);
+    for(std::size_t i = 0; i < str.size(); ++i)
+    {
+        rp.push_back(str[i]);
+    }
+
+    for(std::size_t j = 0; j < str.size(); ++j)
+    {
+        std::cout << rp.find(j) << '\n';
+    }
 
     std::cout << rp.to_string() << '\n';
-    //std::cout << rp.find(2) << '\n';
-    //std::cout << rp.find(5) << '\n';
 
     return 0;
 }

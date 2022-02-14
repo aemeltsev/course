@@ -21,11 +21,6 @@ struct _rope_node
         ,_size(0)
     {}
 
-    _rope_node(char key)
-        :_key(key)
-        ,_size(1)
-    {}
-
     _rope_node(char key,
                std::size_t size,
                _rope_node* left,
@@ -45,13 +40,15 @@ struct _rope_node
         _parent = nullptr;
     }
 
-    char& get_data(){return _key;}
+    char& get_data() {return _key;}
+    _rope_node* get_left_child() {return this->_left;}
+    _rope_node* get_right_child() {return this->_right;}
+
   };
 
 class Rope
 {
-    std::string _str;
-    _rope_node* _root;
+    _rope_node* _root = nullptr;
 
     void _destroy(_rope_node* node);
     void _update(_rope_node* node);
@@ -68,7 +65,9 @@ class Rope
     _rope_node* _max_node(_rope_node* node);
 
 public:
-    explicit Rope(){}
+    Rope();
+    explicit Rope(const std::string& str);
+    ~Rope();
 
     void remove(std::size_t pos);
     void insert(char ch, std::size_t pos);
@@ -76,6 +75,32 @@ public:
     char find(std::size_t index);
     std::string to_string();
 };
+
+Rope::Rope()
+{}
+
+Rope::Rope(const std::string& str)
+{
+    for(std::size_t i = 0; i < str.size(); ++i)
+    {
+        _push_back(str[i], _root);
+    }
+}
+
+Rope::~Rope()
+{
+    _destroy(_root);
+}
+
+void Rope::_destroy(_rope_node* node)
+{
+    if(node)
+    {
+        _destroy(node->get_left_child());
+        _destroy(node->get_right_child());
+        delete node;
+    }
+}
 
 void Rope::_update(_rope_node *node)
 {
@@ -340,7 +365,7 @@ void Rope::_insert(char ch, std::size_t pos, _rope_node *node)
 {
     if(!node)
     {
-        _root = new _rope_node(ch);
+        _root = new _rope_node(ch, 1, nullptr, nullptr, node);
     }
     else
     {
