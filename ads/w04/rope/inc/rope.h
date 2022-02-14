@@ -49,6 +49,7 @@ struct _rope_node
 class Rope
 {
     _rope_node* _root = nullptr;
+    std::size_t _size = 0;
 
     void _destroy(_rope_node* node);
     void _update(_rope_node* node);
@@ -74,6 +75,8 @@ public:
     void push_back(char ch);
     char find(std::size_t index);
     std::string to_string();
+    std::size_t size() {return _size;}
+    bool empty() {return _size == 0;}
 };
 
 Rope::Rope()
@@ -237,6 +240,7 @@ void Rope::_push_back(char ch, _rope_node *node)
 void Rope::push_back(char ch)
 {
     _push_back(ch, _root);
+    ++_size;
 }
 
 char Rope::find(std::size_t index)
@@ -359,6 +363,7 @@ void Rope::remove(std::size_t pos)
 {
     ++pos;
     _remove(_find(_root, pos));
+    --_size;
 }
 
 void Rope::_insert(char ch, std::size_t pos, _rope_node *node)
@@ -403,6 +408,7 @@ void Rope::_insert(char ch, std::size_t pos, _rope_node *node)
 void Rope::insert(char ch, std::size_t pos)
 {
     _insert(ch, pos, _root);
+    ++_size;
 }
 
 std::string Rope::to_string()
