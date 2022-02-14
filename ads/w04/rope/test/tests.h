@@ -18,21 +18,34 @@ TEST(RopeTest, Remove)
 
 }
 
-TEST(RopeTest, Splay)
+TEST(RopeTest, Insert)
 {
 
 }
 
-TEST(RopeTest, Insert)
+TEST(RopeTest, Push_Back)
 {
+    tree::Rope rp;
 
+    std::size_t size = a_str.size()/2;
+    ASSERT_EQ(rp.size(), 0);
+    for(std::size_t i = 0; i < size; ++i)
+    {
+        rp.push_back(a_str[i]);
+    }
+    ASSERT_EQ(rp.size(), size);
+    for(std::size_t j = size; j < a_str.size(); ++j)
+    {
+        rp.push_back(a_str[j]);
+    }
+    ASSERT_EQ(rp.size(), a_str.size());
 }
 
 TEST(RopeTest, Find)
 {
     tree::Rope rp(a_str);
 
-    ASSERT_EQ(rp.find(1), a_str[0]);
+    //ASSERT_EQ(rp.find(1), a_str[0]);
     //ASSERT_EQ(rp->find(2), a_str[1]);
    // ASSERT_EQ(rp->find(3), a_str[2]);
     //ASSERT_EQ(rp->find(4), a_str[3]);
