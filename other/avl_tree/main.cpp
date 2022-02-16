@@ -1,17 +1,8 @@
-#include <iostream>
-#include "avltree.h"
+#include "test.hpp"
 
 int main(int argc, char *argv[])
 {
-    tree::AVLTree<int> tr;
-    tr.insert(5);
-    tr.insert(2);
-    tr.insert(8);
-    tr.insert(4);
-    tr.insert(9);
-    tr.insert(10);
+    ::testing::InitGoogleTest(&argc, argv);
 
-    std::cout << tr.size() << '\n';
-
-    return 0;
+    return RUN_ALL_TESTS();
 }
