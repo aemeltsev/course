@@ -44,20 +44,20 @@ TEST(RopeTest, Push_Back)
 TEST(RopeTest, Find)
 {
     tree::Rope rp(a_str);
+    std::size_t asize = a_str.size();
 
-    //ASSERT_EQ(rp.find(1), a_str[0]);
-    //ASSERT_EQ(rp->find(2), a_str[1]);
-   // ASSERT_EQ(rp->find(3), a_str[2]);
-    //ASSERT_EQ(rp->find(4), a_str[3]);
-    //ASSERT_EQ(rp->find(5), a_str[4]);
-    //ASSERT_EQ(rp->find(6), a_str[5]);
-   // ASSERT_EQ(rp->find(7), a_str[6]);
-    //ASSERT_EQ(rp->find(8), a_str[7]);
-    //ASSERT_EQ(rp->find(9), a_str[8]);
-   // ASSERT_EQ(rp->find(10), a_str[9]);
-   // ASSERT_EQ(rp->find(11), a_str[10]);
-   // ASSERT_EQ(rp->find(12), a_str[11]);
-  //  ASSERT_EQ(rp->find(13), a_str[12]);
+    for(std::size_t i = 0; i < asize; ++i)
+    {
+        ASSERT_EQ(rp.find(i), a_str[i]);
+    }
+
+    tree::Rope st(b_str);
+    std::size_t bsize = b_str.size();
+
+    for(std::size_t i = 0; i < bsize; ++i)
+    {
+        ASSERT_EQ(st.find(i), b_str[i]);
+    }
 }
 
 TEST(RopeTest, ToString)
