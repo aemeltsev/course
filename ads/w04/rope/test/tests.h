@@ -24,6 +24,8 @@ TEST(RopeTest, Insert)
     std::string b = a_str.substr(22);
     tree::Rope rp_1(a+b);
 
+    rp_1.insert('_', 13);
+    ASSERT_EQ(rp_1.find(13), a_str[13]);
     rp_1.insert('n', 14);
     ASSERT_EQ(rp_1.find(14), a_str[14]);
     rp_1.insert('o', 15);
@@ -46,22 +48,17 @@ TEST(RopeTest, Insert)
     tree::Rope rp_2(c+d);
 
     rp_2.insert('_', 8);
+    ASSERT_EQ(rp_2.find(8), b_str[8]);
     rp_2.insert('h', 9);
-    //ASSERT_EQ(rp_2.find(9), b_str[9]);
+    ASSERT_EQ(rp_2.find(9), b_str[9]);
     rp_2.insert('e', 10);
-    //ASSERT_EQ(rp_2.find(10), b_str[10]);
+    ASSERT_EQ(rp_2.find(10), b_str[10]);
     rp_2.insert('r', 11);
-    //ASSERT_EQ(rp_2.find(11), b_str[11]);
+    ASSERT_EQ(rp_2.find(11), b_str[11]);
     rp_2.insert('e', 12);
-    //ASSERT_EQ(rp_2.find(12), b_str[12]);
+    ASSERT_EQ(rp_2.find(12), b_str[12]);
     rp_2.insert('_', 13);
-    //ASSERT_EQ(rp_2.find(13), b_str[13]);
-
-    std::cout << rp_1.to_string() << '\n';
-    std::cout << a_str << '\n';
-
-    std::cout << rp_2.to_string() << '\n';
-    std::cout << b_str << '\n';
+    ASSERT_EQ(rp_2.find(13), b_str[13]);
 
     for(std::size_t i = 0; i < a_str.size(); ++i)
     {
