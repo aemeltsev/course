@@ -36,108 +36,111 @@ public:
         }
     }
 
+    PixRGB<T>& operator=(const PixRGB<T>& pix)
+    {
+        if(this != &pix)
+        {
+            this->m_r = pix.m_r;
+            this->m_g = pix.m_g;
+            this->m_b = pix.m_b;
+        }
+        return *this;
+    }
+
     PixRGB<T> operator+(const PixRGB<T>& other)
     {
-        return static_cast<PixRGB<T>>(this->m_r + other.m_r,
-                                      this->m_g + other.m_g,
-                                      this->m_b + other.m_b);
+        return PixRGB<T>(this->m_r + other.m_r,
+                         this->m_g + other.m_g,
+                         this->m_b + other.m_b);
     }
 
     PixRGB<T> operator-(const PixRGB<T>& other)
     {
-        return static_cast<PixRGB<T>>(this->m_r - other.m_r,
-                                      this->m_g - other.m_g,
-                                      this->m_b - other.m_b);
+        return PixRGB<T>(this->m_r - other.m_r,
+                         this->m_g - other.m_g,
+                         this->m_b - other.m_b);
     }
 
     PixRGB<T> operator*(const PixRGB<T>& other)
     {
-        return static_cast<PixRGB<T>>(static_cast<T>(this->m_r * other.m_r),
-                                      static_cast<T>(this->m_g * other.m_g),
-                                      static_cast<T>(this->m_b * other.m_b));
+        return PixRGB<T>(static_cast<T>(this->m_r * other.m_r),
+                         static_cast<T>(this->m_g * other.m_g),
+                         static_cast<T>(this->m_b * other.m_b));
     }
 
     PixRGB<T> operator/(const PixRGB<T>& other)
     {
-        return static_cast<PixRGB<T>>(static_cast<T>(this->m_r / other.m_r),
-                                      static_cast<T>(this->m_g / other.m_g),
-                                      static_cast<T>(this->m_b / other.m_b));
+        return PixRGB<T>(static_cast<T>(this->m_r / other.m_r),
+                         static_cast<T>(this->m_g / other.m_g),
+                         static_cast<T>(this->m_b / other.m_b));
     }
 
     PixRGB<T>& operator+=(const PixRGB<T>& other)
     {
-        this += other;
-        return *this;
+        return *this += other;
     }
 
     PixRGB<T>& operator-=(const PixRGB<T>& other)
     {
-        this -= other;
-        return *this;
+        return *this -= other;
     }
 
     PixRGB<T>& operator*=(const PixRGB<T>& other)
     {
-        this *= other;
-        return *this;
+        return *this *= other;
     }
 
     PixRGB<T>& operator/=(const PixRGB<T>& other)
     {
-        this /= other;
-        return *this;
+        return *this /= other;
     }
 
     PixRGB<T> operator+(const QRgb& px)
     {
-        return static_cast<PixRGB<T>>(this->m_r + static_cast<T>(qRed(px)),
-                                      this->m_g + static_cast<T>(qGreen(px)),
-                                      this->m_b + static_cast<T>(qBlue(px)));
+        return PixRGB<T>(this->m_r + static_cast<T>(qRed(px)),
+                         this->m_g + static_cast<T>(qGreen(px)),
+                         this->m_b + static_cast<T>(qBlue(px)));
     }
 
     PixRGB<T> operator-(const QRgb& px)
     {
-        return static_cast<PixRGB<T>>(this->m_r - static_cast<T>(qRed(px)),
-                                      this->m_g - static_cast<T>(qGreen(px)),
-                                      this->m_b - static_cast<T>(qBlue(px)));
+        return PixRGB<T>(this->m_r - static_cast<T>(qRed(px)),
+                         this->m_g - static_cast<T>(qGreen(px)),
+                         this->m_b - static_cast<T>(qBlue(px)));
     }
 
     PixRGB<T> operator*(const QRgb& px)
     {
-        return static_cast<PixRGB<T>>(this->m_r + static_cast<T>(qRed(px)),
-                                      this->m_g + static_cast<T>(qGreen(px)),
-                                      this->m_b + static_cast<T>(qBlue(px)));
+        return PixRGB<T>(this->m_r + static_cast<T>(qRed(px)),
+                         this->m_g + static_cast<T>(qGreen(px)),
+                         this->m_b + static_cast<T>(qBlue(px)));
     }
 
     PixRGB<T> operator/(const QRgb& px)
     {
-        return static_cast<PixRGB<T>>(this->m_r + static_cast<T>(qRed(px)),
-                                      this->m_g + static_cast<T>(qGreen(px)),
-                                      this->m_b + static_cast<T>(qBlue(px)));
+        return PixRGB<T>(this->m_r + static_cast<T>(qRed(px)),
+                         this->m_g + static_cast<T>(qGreen(px)),
+                         this->m_b + static_cast<T>(qBlue(px)));
     }
 
     PixRGB<T>& operator+=(const QRgb& px)
     {
-        this += px;
-        return *this;
+        return *this += px;
     }
 
     PixRGB<T>& operator-=(const QRgb& px)
     {
-        this -= px;
-        return *this;
+        return *this -= px;
     }
 
     PixRGB<T>& operator*=(const QRgb& px)
     {
-        this *= px;
-        return *this;
+        return *this *= px;
     }
 
     PixRGB<T>& operator/=(const QRgb& px)
     {
-        this /= px;
-        return *this;
+        return *this /= px;
     }
 
     bool operator ==(const PixRGB& other) const
