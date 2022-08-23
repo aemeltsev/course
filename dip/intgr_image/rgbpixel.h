@@ -125,22 +125,38 @@ public:
 
     PixRGB<T>& operator+=(const QRgb& px)
     {
-        return *this += px;
+        this->m_r += static_cast<T>(qRed(px));
+        this->m_g += static_cast<T>(qGreen(px));
+        this->m_b += static_cast<T>(qBlue(px));
+
+        return *this;
     }
 
     PixRGB<T>& operator-=(const QRgb& px)
     {
-        return *this -= px;
+        this->m_r -= static_cast<T>(qRed(px));
+        this->m_g -= static_cast<T>(qGreen(px));
+        this->m_b -= static_cast<T>(qBlue(px));
+
+        return *this;
     }
 
     PixRGB<T>& operator*=(const QRgb& px)
     {
-        return *this *= px;
+        this->m_r *= static_cast<T>(qRed(px));
+        this->m_g *= static_cast<T>(qGreen(px));
+        this->m_b *= static_cast<T>(qBlue(px));
+
+        return *this;
     }
 
     PixRGB<T>& operator/=(const QRgb& px)
     {
-        return *this /= px;
+        this->m_r /= static_cast<T>(qRed(px));
+        this->m_g /= static_cast<T>(qGreen(px));
+        this->m_b /= static_cast<T>(qBlue(px));
+
+        return *this;
     }
 
     bool operator ==(const PixRGB& other) const

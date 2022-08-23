@@ -76,5 +76,5 @@ int main(int argc, char *argv[])
     }
     output_im.save("out.png");
 
-    return a.exec();
+    return EXIT_SUCCESS;
 }
