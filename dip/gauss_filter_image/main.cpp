@@ -16,9 +16,9 @@ inline QVector<qreal> gaussKernel(int radius, qreal sigma, int *kl)
     qreal sum = 0;
 
     // Create convolution matrix according to the formula:
-    for (int j = 0; j < kw; j++)
+    for (int j = 0; j < kw; ++j)
     {
-        for (int i = 0; i < kw; i++)
+        for (int i = 0; i < kw; ++i)
         {
             int x = i - radius;
             int y = j - radius;
@@ -44,9 +44,9 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     Q_UNUSED(a)
 
-    QImage inImage("lena.png");
-    inImage = inImage.convertToFormat(QImage::Format_RGB32);
-    QImage outImage(inImage.size(), inImage.format());
+    QImage input_im("lena.png");
+    input_im = input_im.convertToFormat(QImage::Format_RGB32);
+    QImage output_im(input_im.size(), input_im.format());
 
     // Here we configure the denoise parameters.
     int radius = 3;
@@ -57,40 +57,40 @@ int main(int argc, char *argv[])
     QVector<qreal> kernel = gaussKernel(radius, sigma, &kw);
 
     // Add noise to the image
-    QRandomGenerator *rg = QRandomGenerator::global();
     for (int i = 0; i < 5000; i++) {
-        inImage.setPixel(rg->bounded(QTime::currentTime().msec()) % inImage.width(),
-                         rg->bounded(QTime::currentTime().msec()) % inImage.height(),
-                         qRgb(rg->bounded(QTime::currentTime().msec()) % 256,
-                              rg->bounded(QTime::currentTime().msec()) % 256,
-                              rg->bounded(QTime::currentTime().msec()) % 256));
+        auto var = QRandomGenerator::global()->bounded(QTime::currentTime().msec());
+        input_im.setPixel(var % input_im.width(),
+                         var % input_im.height(),
+                         qRgb(var % 256,
+                              var % 256,
+                              var % 256));
     }
 
     QElapsedTimer timer;
     timer.start();
 
-    for (int y = 0; y < inImage.height(); y++) {
-        const QRgb *iLine = (const QRgb *) inImage.constScanLine(y);
-        QRgb *oLine = (QRgb *) outImage.scanLine(y);
+    for (int y = 0; y < input_im.height(); y++) {
+        const QRgb *iLine = reinterpret_cast<const QRgb*>(input_im.constScanLine(y));
+        QRgb *oLine = reinterpret_cast<QRgb*>(output_im.scanLine(y));
 
-        for (int x = 0; x < inImage.width(); x++) {
+        for (int x = 0; x < input_im.width(); x++) {
             dip::PixRGB<qreal> sum;
             qreal sumW = 0;
 
             // Apply kernel.
             for (int j = 0, pos = 0; j < kw; j++) {
-                const QRgb *line = (const QRgb *) inImage.constScanLine(y + j - radius);
+                const QRgb *line =reinterpret_cast<const QRgb*>(input_im.constScanLine(y + j - radius));
 
                 if (y + j < radius
-                    || y + j >= radius + inImage.height())
+                    || y + j >= radius + input_im.height())
                     continue;
 
                 for (int i = 0; i < kw; i++, pos++) {
                     if (x + i < radius
-                        || x + i >= radius + inImage.width())
+                        || x + i >= radius + input_im.width())
                         continue;
 
-                    dip::PixRGB<quint32> pixel(line[x + i - radius]);
+                    dip::PixRGB<quint8> pixel(line[x + i - radius]);
                     qreal weight = kernel[pos];
                     sum += weight * pixel;
                     sumW += weight;
@@ -101,15 +101,15 @@ int main(int argc, char *argv[])
             // fixed.
             sum /= sumW;
 
-            oLine[x] = qRgba(static_cast<int>(sum.pRed()),
-                             static_cast<int>(sum.pGreen()),
-                             static_cast<int>(sum.pBlue()),
+            oLine[x] = qRgba(sum.pRed(),
+                             sum.pGreen(),
+                             sum.pBlue(),
                              qAlpha(iLine[x]));
         }
     }
 
     qDebug() << timer.elapsed();
-    outImage.save("gauss.png");
+    output_im.save("gauss.png");
 
     return EXIT_SUCCESS;
 }

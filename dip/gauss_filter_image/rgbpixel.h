@@ -26,7 +26,7 @@ public:
         ,m_b(b)
     {}
 
-    PixRGB(const QRgb &pixel)
+    PixRGB(QRgb pixel)
         :m_r(qRed(pixel))
         ,m_g(qGreen(pixel))
         ,m_b(qBlue(pixel))
@@ -83,22 +83,38 @@ public:
 
     PixRGB<T>& operator+=(const PixRGB<T>& other)
     {
-        return *this += other;
+        this->m_r += static_cast<T>(other.m_r);
+        this->m_g += static_cast<T>(other.m_g);
+        this->m_b += static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T>& operator-=(const PixRGB<T>& other)
     {
-        return *this -= other;
+        this->m_r -= static_cast<T>(other.m_r);
+        this->m_g -= static_cast<T>(other.m_g);
+        this->m_b -= static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T>& operator*=(const PixRGB<T>& other)
     {
-        return *this *= other;
+        this->m_r *= static_cast<T>(other.m_r);
+        this->m_g *= static_cast<T>(other.m_g);
+        this->m_b *= static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T>& operator/=(const PixRGB<T>& other)
     {
-        return *this /= other;
+        this->m_r /= static_cast<T>(other.m_r);
+        this->m_g /= static_cast<T>(other.m_g);
+        this->m_b /= static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T> operator+(const QRgb& px)
@@ -161,6 +177,42 @@ public:
         this->m_r /= static_cast<T>(qRed(px));
         this->m_g /= static_cast<T>(qGreen(px));
         this->m_b /= static_cast<T>(qBlue(px));
+
+        return *this;
+    }
+
+    PixRGB<T>& operator+=(T var)
+    {
+        this->m_r += var;
+        this->m_g += var;
+        this->m_b += var;
+
+        return *this;
+    }
+
+    PixRGB<T>& operator-=(T var)
+    {
+        this->m_r -= var;
+        this->m_g -= var;
+        this->m_b -= var;
+
+        return *this;
+    }
+
+    PixRGB<T>& operator*=(T var)
+    {
+        this->m_r *= var;
+        this->m_g *= var;
+        this->m_b *= var;
+
+        return *this;
+    }
+
+    PixRGB<T>& operator/=(T var)
+    {
+        this->m_r /= var;
+        this->m_g /= var;
+        this->m_b /= var;
 
         return *this;
     }
