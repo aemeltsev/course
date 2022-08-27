@@ -26,6 +26,12 @@ public:
         ,m_b(b)
     {}
 
+    PixRGB(QRgb pixel)
+        :m_r(qRed(pixel))
+        ,m_g(qGreen(pixel))
+        ,m_b(qBlue(pixel))
+    {}
+
     PixRGB(const PixRGB<T>& pix)
     {
         if(this != &pix)
@@ -77,22 +83,38 @@ public:
 
     PixRGB<T>& operator+=(const PixRGB<T>& other)
     {
-        return *this += other;
+        this->m_r += static_cast<T>(other.m_r);
+        this->m_g += static_cast<T>(other.m_g);
+        this->m_b += static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T>& operator-=(const PixRGB<T>& other)
     {
-        return *this -= other;
+        this->m_r -= static_cast<T>(other.m_r);
+        this->m_g -= static_cast<T>(other.m_g);
+        this->m_b -= static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T>& operator*=(const PixRGB<T>& other)
     {
-        return *this *= other;
+        this->m_r *= static_cast<T>(other.m_r);
+        this->m_g *= static_cast<T>(other.m_g);
+        this->m_b *= static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T>& operator/=(const PixRGB<T>& other)
     {
-        return *this /= other;
+        this->m_r /= static_cast<T>(other.m_r);
+        this->m_g /= static_cast<T>(other.m_g);
+        this->m_b /= static_cast<T>(other.m_b);
+
+        return *this;
     }
 
     PixRGB<T> operator+(const QRgb& px)
