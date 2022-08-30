@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     qreal sigma = 1;
 
     // Add noise to the image
-    for (int i = 0; i < 25000; i++) {
+    for (int i = 0; i < 5000; i++) {
         auto var = QRandomGenerator::global()->bounded(QTime::currentTime().msec());
         input_im.setPixel(var % input_im.width(),
                          var % input_im.height(),
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
     }
 
     qDebug() << timer.elapsed();
-    output_im.save("gauss.png");
+    output_im.save("mean.png");
 
     return EXIT_SUCCESS;
 }

@@ -61,11 +61,26 @@ public:
         return *this;
     }
 
+    PixRGB<T> operator+(const PixRGB<T>& other) const
+    {
+        return PixRGB<T>(this->m_r + other.m_r,
+                         this->m_g + other.m_g,
+                         this->m_b + other.m_b);
+    }
+
     PixRGB<T> operator+(const PixRGB<T>& other)
     {
         return PixRGB<T>(this->m_r + other.m_r,
                          this->m_g + other.m_g,
                          this->m_b + other.m_b);
+    }
+
+
+    PixRGB<T> operator-(const PixRGB<T>& other) const
+    {
+        return PixRGB<T>(this->m_r - other.m_r,
+                         this->m_g - other.m_g,
+                         this->m_b - other.m_b);
     }
 
     PixRGB<T> operator-(const PixRGB<T>& other)
@@ -75,52 +90,66 @@ public:
                          this->m_b - other.m_b);
     }
 
+    PixRGB<T> operator*(const PixRGB<T>& other) const
+    {
+        return PixRGB<T>(this->m_r * other.m_r,
+                         this->m_g * other.m_g,
+                         this->m_b * other.m_b);
+    }
+
     PixRGB<T> operator*(const PixRGB<T>& other)
     {
-        return PixRGB<T>(static_cast<T>(this->m_r * other.m_r),
-                         static_cast<T>(this->m_g * other.m_g),
-                         static_cast<T>(this->m_b * other.m_b));
+        return PixRGB<T>(this->m_r * other.m_r,
+                         this->m_g * other.m_g,
+                         this->m_b * other.m_b);
+    }
+
+    PixRGB<T> operator/(const PixRGB<T>& other) const
+    {
+        return PixRGB<T>(this->m_r / other.m_r,
+                         this->m_g / other.m_g,
+                         this->m_b / other.m_b);
     }
 
     PixRGB<T> operator/(const PixRGB<T>& other)
     {
-        return PixRGB<T>(static_cast<T>(this->m_r / other.m_r),
-                         static_cast<T>(this->m_g / other.m_g),
-                         static_cast<T>(this->m_b / other.m_b));
+        return PixRGB<T>(this->m_r / other.m_r,
+                         this->m_g / other.m_g,
+                         this->m_b / other.m_b);
     }
 
     PixRGB<T>& operator+=(const PixRGB<T>& other)
     {
-        this->m_r += static_cast<T>(other.m_r);
-        this->m_g += static_cast<T>(other.m_g);
-        this->m_b += static_cast<T>(other.m_b);
+        this->m_r += other.m_r;
+        this->m_g += other.m_g;
+        this->m_b += other.m_b;
 
         return *this;
     }
 
     PixRGB<T>& operator-=(const PixRGB<T>& other)
     {
-        this->m_r -= static_cast<T>(other.m_r);
-        this->m_g -= static_cast<T>(other.m_g);
-        this->m_b -= static_cast<T>(other.m_b);
+        this->m_r -= other.m_r;
+        this->m_g -= other.m_g;
+        this->m_b -= other.m_b;
 
         return *this;
     }
 
     PixRGB<T>& operator*=(const PixRGB<T>& other)
     {
-        this->m_r *= static_cast<T>(other.m_r);
-        this->m_g *= static_cast<T>(other.m_g);
-        this->m_b *= static_cast<T>(other.m_b);
+        this->m_r *= other.m_r;
+        this->m_g *= other.m_g;
+        this->m_b *= other.m_b;
 
         return *this;
     }
 
     PixRGB<T>& operator/=(const PixRGB<T>& other)
     {
-        this->m_r /= static_cast<T>(other.m_r);
-        this->m_g /= static_cast<T>(other.m_g);
-        this->m_b /= static_cast<T>(other.m_b);
+        this->m_r /= other.m_r;
+        this->m_g /= other.m_g;
+        this->m_b /= other.m_b;
 
         return *this;
     }
@@ -228,7 +257,7 @@ PixRGB<qreal> operator*(qreal lhs, const PixRGB<T>& rhs)
                          lhs * rhs.pBlue());
 }
 
-template<typename T>
+template<typename T> inline
 PixRGB<T> integral_sum(const PixRGB<T>* other,
                        int line_width,
                        int x, int y, int kw, int kh)
@@ -292,7 +321,7 @@ PixRGB<T> mult(Y n, const PixRGB<T>& other)
 template<typename T>
 PixRGB<T> exp(const PixRGB<T>& other)
 {
-    return PixRGB<T>(std::exp(other.pRed()).
+    return PixRGB<T>(std::exp(other.pRed()),
                      std::exp(other.pGreen()),
                      std::exp(other.pBlue()));
 }
