@@ -45,6 +45,7 @@ void weatherdata::slot_netw_man(QNetworkReply *rep)
             {
                 auto date_info = v.toObject();
                 auto data = unix_time2human_time(date_info.value("dt").toInt());
+                qDebug() << "Date: " << data.date << "/" << data.month << "/" << data.year << '\n';
 
                 auto temp_info = date_info.value("main").toObject();
                 auto temp = temp_info.value("temp").toDouble() - 273;
@@ -53,13 +54,57 @@ void weatherdata::slot_netw_man(QNetworkReply *rep)
                 auto temp_max = temp_info.value("temp_max").toDouble() - 273;
                 auto pressure = temp_info.value("pressure").toDouble() / 1.333;
                 auto humidity = temp_info.value("humidity").toDouble();
-                qDebug() << "Date: " << data.date << "/" << data.month << "/" << data.year << '\n';
                 qDebug() << "Temperature: " << temp << '\n';
                 qDebug() << "Temperature feel like: " << feel_like << '\n';
                 qDebug() << "Temperature min: " << temp_min << '\n';
                 qDebug() << "Temperature max: " << temp_max << '\n';
                 qDebug() << "Pressure: " << pressure << '\n';
                 qDebug() << "Humidity: " << humidity << '\n';
+
+                auto weather_info = date_info.value("weather").toArray();
+                QString weather_main = "";
+                QString weather_desc = "";
+                if(!weather_info.empty())
+                {
+                    foreach(const QJsonValue& w, weather_info)
+                    {
+                        auto tmp = w.toObject();
+                        weather_main = tmp.value("main").toString();
+                        weather_desc = tmp.value("description").toString();
+                        qDebug() << "Weather: " << weather_main << '\n';
+                        qDebug() << "Weather description: " << weather_desc << '\n';
+                    }
+                }
+
+                auto clouds_info = date_info.value("clouds").toObject();
+                auto clouds = clouds_info.value("all").toInt();
+                qDebug() << "Clouds: " << clouds << '\n';
+
+                auto wind_info = date_info.value("wind").toObject();
+                auto wind_speed = wind_info.value("speed").toDouble();
+                auto wind_degree = wind_info.value("deg").toInt();
+                auto wind_gust = wind_info.value("gust").toDouble();
+                qDebug() << "Wind speed: " << wind_speed << '\n';
+                qDebug() << "Wind degree: " << wind_degree << '\n';
+                qDebug() << "Wind gust: " << wind_gust << '\n';
+
+                auto visibility_info = date_info.value("visibility").toInt();
+                qDebug() << "Visibility: " << visibility_info << '\n';
+
+                auto pop_info = date_info.value("pop").toDouble() * 100;
+                qDebug() << "Probability of precipitation: " << pop_info << "%" << '\n';
+
+                auto rain_info = date_info.value("rain").toObject();
+                auto rain_3h = rain_info.value("3h").toDouble() * 100;
+                qDebug() << "Rain volume for last 3 hours: " << rain_3h << "%" << '\n';
+
+//                auto snow_info = date_info.value("snow").toObject();
+//                auto snow_3h = snow_info.value("3h").toInt();
+//                qDebug() << "Snow volume for last 3 hours: " << snow_3h << '\n';
+
+                auto sys_info = date_info.value("sys").toObject();
+                auto pod = sys_info.value("pod").toString();
+                qDebug() << "Part of the day: " << pod << '\n';
             }
         }
         else{
