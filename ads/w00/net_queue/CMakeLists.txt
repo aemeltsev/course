@@ -1,37 +1,30 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.10)
 set(BIN net_queue)
 project(${BIN} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-include_directories(inc src test)
 
 find_package(Threads)
-
 if(Threads_FOUND)
     message ("Thread library was found")
 else()
     message (FATAL_ERROR "Cannot find Threads package")
 endif()
 
-find_package(GTest)
+option(USE_TEST "Enable Tests" ON)
 
-if(GTest_FOUND)
-    message("Google Test library was found")
+if(USE_TEST)
+    add_compile_options(-std=c++11 -g -O2 -Wall -pedantic)
+    add_library(netqueue inc/nqueue.h src/nqueue.cpp)
+    target_include_directories(netqueue PUBLIC inc)
+
+    enable_testing()
+    add_subdirectory(test)
+
 else()
-    message(FATAL_ERROR "Cannot find Google Test package")
+    include_directories(inc src test)
+    add_compile_options(-std=c++11 -g -O2 -Wall -Werror -pedantic)
+    add_executable(netqueue inc/nqueue.h src/nqueue.cpp src/main.cpp)
+
 endif()
-
-add_compile_options(-std=c++11 -g -O2 -Wall)
-link_libraries(pthread)
-link_libraries(gtest)
-
-set(HEADERS nqueue.h tests.h)
-set(SOURCES main.cpp)
-set(REQUIRED_LIBRARIES pthread gtest)
-
-add_executable(${BIN} ${SOURCES})
-target_link_libraries(${BIN} PRIVATE ${EXTRA_LIBS} ${REQUIRED_LIBRARIES})
-

@@ -13,7 +13,7 @@ int main()
     NQueue<std::size_t> queue;
     std::vector<int> result;
 
-    for(auto i =0; i < pack_count; ++i)
+    for(std::size_t i =0; i < pack_count; ++i)
     {
         auto arrival = emitter[i].first;
         auto duration = emitter[i].second;
