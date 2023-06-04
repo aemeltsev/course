@@ -1,37 +1,30 @@
 #!/bin/bash
-# chmod u+x load.sh
-# ls -l load.sh
-# use ./load.sh -f out.txt 
+# chmod u+x system.sh
+# ls -l system.sh
+# use ./system.sh -f system.txt 
 
 PROGNAME="$(basename $0)"
 TITLE="System Information Report For $HOSTNAME"
 CURRENT_TIME=$(date +"%x %r %Z")
 TIME_STAMP="Generated $CURRENT_TIME, by $USER"
 
-report_dmesg () {
+report_systemd () {
     cat <<-_EOF_
             <pre>$(echo "****************")</pre>
-            <pre>$(sudo dmesg)</pre>
+            <pre>$(systemctl list-units)</pre>
+            <pre>$(echo "****************")</pre>
+            <pre>$(systemctl --failed)</pre>
+            <pre>$(echo "****************")</pre>
+            <pre>$(systemctl list-units --type=service)</pre>
 _EOF_
     return
 }
 
-report_load () {
+report_journald () {
     cat <<-_EOF_
             <pre>$(echo "****************")</pre>
-            <pre>$(cat /var/log/dmesg)</pre>
+            <pre>$(journalctl -n 50)</pre>
 _EOF_
-    return
-}
-
-report_boot () {
-    cat <<-_EOF_
-            <pre>$(echo "****************")</pre>
-            <pre>$(ls /boot)</pre>
-            <pre>$(echo "****************")</pre>
-            <pre>$(cat /boot/grub/grub.cfg)</pre>
-_EOF_
-
     return
 }
 
@@ -49,12 +42,10 @@ write_out_page () {
         <body>
             <h1>$TITLE</h1>
             <p>$TIME_STAMP</p>
-            $(echo "**************** For dmesg report ****************")
-            $(report_dmesg)
-            $(echo "**************** For load report ****************")
-            $(report_load)
-            $(echo "**************** For boot report ****************")
-            $(report_boot)
+            $(echo "**************** For systemd report ****************")
+            $(report_systemd)
+            $(echo "**************** For journald report ****************")
+            $(report_journald)
         </body>
     </html>
     

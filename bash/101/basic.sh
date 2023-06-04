@@ -12,16 +12,12 @@ return
 
 how_to_var () {
     grade=5
-
-person="Adam"
-
-mydir=$(pwd)
-
-var1=$((5 + 5))
-
-var2=$(($var1 * 2))
-
-echo "$person is a god boy, he is in grade $grade and his dir $mydir , and var = $var2"
+    person="Adam"
+    mydir=$(pwd)
+    var1=$((5 + 5))
+    var2=$(($var1 * 2))
+    echo "$person is a god boy, he is in grade $grade and his dir $mydir , and var = $var2"
+return
 }
 
 check_user (){
