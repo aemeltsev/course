@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="content">
+    {% block app_content %}
+        <a href="{{ url_for('index')}}" class="btn btn-warning home">Home</a>
+        <a href="{{ url_for('live')}}" class="btn btn-info refresh">Refresh</a>
+        <div class="counter">{{ gol_object.gen_counter }}</div>
+    {% endblock %}
+</div>
+
+<table class="world">
+    {% for i in range(gol_object.world | length) %}
+    <tr>
+        {% for j in range(gol_object.world[i] | length) %}
+            {% if gol_object.world[i][j] == 1 %}
+                <td class="cell living-cell"></td>
+            {% elif gol_object.old_world[i][j] == 1 and gol_object.world[i][j] == 0 %}
+                <td class="cell dead-cell"></td>
+            {% else %}
+                <td class="cell"></td>
+            {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='script.js' )}}"></script>
+{% endblock %}
